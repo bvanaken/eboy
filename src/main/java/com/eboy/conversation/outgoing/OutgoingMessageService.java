@@ -3,7 +3,11 @@ package com.eboy.conversation.outgoing;
 import com.eboy.conversation.outgoing.dto.Button;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.conversation.outgoing.dto.MessagePayload;
+import com.eboy.data.dto.Ad;
+import com.eboy.data.dto.Field;
+import com.eboy.data.dto.Price;
 import com.eboy.event.IntentEvent;
+import com.eboy.event.LatestAdEvent;
 import com.eboy.nlp.Intent;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.MessageType;
@@ -19,6 +23,8 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.logging.Logger;
+
+import static org.aspectj.bridge.Version.text;
 
 @Service
 public class OutgoingMessageService {
@@ -52,13 +58,13 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(IntentEvent event) {
-        Assert.notNull(event.key);
-        Assert.notNull(event.userId);
-
-        logger.info("handle event: " + event.key);
-
         String key = event.key;
         Long userId = event.userId;
+
+        Assert.notNull(key);
+        Assert.notNull(userId);
+
+        logger.info("handle event: " + event.key);
 
         Map<String, List<MessageEntry>> messageMap = this.generalMessageMap;
 
@@ -78,6 +84,20 @@ public class OutgoingMessageService {
                 this.sendText(text, String.valueOf(userId), event.platform);
             }
         }
+    }
+
+    @Subscribe
+    public void handleEvent(LatestAdEvent event) {
+        Ad data = event.data;
+        Long userId = event.userId;
+
+        Assert.notNull(data);
+        Assert.notNull(userId);
+
+        logger.info("Handle latest Ad.");
+
+        String lastAdMessage = lastAdMessage(data);
+        this.sendText(lastAdMessage, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {
@@ -102,5 +122,14 @@ public class OutgoingMessageService {
             }
         }
         return null;
+    }
+
+    private String lastAdMessage(Ad ad) {
+        Price price = ad.getPrice();
+        Integer amount = (Integer) price.getAmount().getValue();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look?");
+        sb.append("The price for the item is: " + amount);
+        return sb.toString();
     }
 }
