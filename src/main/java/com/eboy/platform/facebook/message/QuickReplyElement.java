@@ -1,7 +1,5 @@
 package com.eboy.platform.facebook.message;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class QuickReplyElement {
 
     @JsonProperty("content_type")
