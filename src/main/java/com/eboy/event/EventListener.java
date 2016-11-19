@@ -32,18 +32,18 @@ public class EventListener {
     @Subscribe
     public void handleEvent(IntentEvent event) {
         if (event.platform.equals(Platform.FACEBOOK)) {
-            /*facebookMessageService.sendTextMessage(String.valueOf(event.userId), "Intent event");*/
+            outgoingFacebookMessageService.sendText(String.valueOf(event.userId), "Intent event");
         } else {
-            /*telegramMessageService.sendTextMessage(String.valueOf(event.userId), "Intent event");*/
+            outgoingTelegramMessageService.sendText(String.valueOf(event.userId), "Intent event");
         }
     }
 
     @Subscribe
     public void handleEvent(UpdateEvent event) {
         if (event.platform.equals(Platform.FACEBOOK)) {
-            /*facebookMessageService.sendTextMessage(String.valueOf(event.userId), "Intent event");*/
+            outgoingFacebookMessageService.sendText(String.valueOf(event.userId), "Intent event");
         } else {
-            /*telegramMessageService.sendTextMessage(String.valueOf(event.userId), "Intent event");*/
+            outgoingTelegramMessageService.sendText(String.valueOf(event.userId), "Intent event");
         }
     }
 }
