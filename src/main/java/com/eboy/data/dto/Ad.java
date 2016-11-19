@@ -18,6 +18,9 @@ public class Ad {
     @JsonProperty
     Field title;
 
+    @JsonProperty
+    Field description;
+
     @JsonProperty(value = "ad-address")
     Address address;
 
@@ -43,6 +46,10 @@ public class Ad {
 
     public Field getType() {
         return type;
+    }
+
+    public Field getDescription() {
+        return description;
     }
 
     public Field getTitle() {
@@ -83,6 +90,7 @@ public class Ad {
                 ", price=" + price +
                 ", type=" + type +
                 ", title=" + title +
+                ", description=" + description +
                 ", address=" + address +
                 ", status=" + status +
                 ", dateTime=" + dateTime +

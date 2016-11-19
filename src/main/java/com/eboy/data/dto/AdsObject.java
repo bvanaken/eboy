@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AdsObject {
 
     @JsonProperty("value")
-    AdsValue object;
+    AdsValue adsValue;
 
     public AdsObject() {
     }
 
-    public AdsValue getObject() {
-        return object;
+    public AdsValue getAdsValue() {
+        return adsValue;
     }
 
     @Override
     public String toString() {
         return "AdsObject{" +
-                "object=" + object +
+                "adsValue=" + adsValue +
                 '}';
     }
 }
