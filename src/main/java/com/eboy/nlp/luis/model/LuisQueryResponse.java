@@ -1,4 +1,4 @@
-package com.eboy.nlp.luis;
+package com.eboy.nlp.luis.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
