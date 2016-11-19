@@ -37,22 +37,22 @@ public class EbayAdService {
         String url = BASE_STRING;
 
         for (String keyword : keywords) {
-            url += keyword + "%20";
+            url += keyword + " ";
         }
 
         // delete the last %20
-        url = url.substring(0, url.length() - 3);
+        url = url.substring(0, url.length() - 1);
         url += FIELDS;
 
         HttpHeaders headers = createHeaders(username, password);
 
         HttpEntity<String> request = new HttpEntity<String>(headers);
+
         ResponseEntity<EbayResponse> response = restTemplate.exchange(url, HttpMethod.GET, request, EbayResponse.class);
 
         EbayResponse responseBody = response.getBody();
 
         logger.info("Ebay URL requested: " + url);
-        logger.info("resp: " + responseBody);
 
         return responseBody.getAdsObject().getAdsValue().getAds();
 

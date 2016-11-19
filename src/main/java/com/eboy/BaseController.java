@@ -29,7 +29,8 @@ public class BaseController {
 
         ArrayList<String> keywords = new ArrayList<>();
         keywords.add("macbook");
-//        keywords.add("pro");
+        keywords.add("pro");
+        keywords.add("2014");
 
         return adService.getAdsForKeywords(keywords);
     }
