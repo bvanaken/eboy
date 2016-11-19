@@ -1,6 +1,9 @@
 package com.eboy.redis;
 
 import com.eboy.redis.model.Subscription;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
@@ -8,7 +11,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -16,26 +19,27 @@ public class SubscriptionPersister {
 
     private RedisTemplate<String, Object> redisTemplate;
     private RedisSerializer<Object> serializer;
+    ObjectMapper mapper;
 
     @Autowired
     public SubscriptionPersister(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.serializer = new JdkSerializationRedisSerializer();
+        this.mapper = new ObjectMapper();
     }
 
     public List<Subscription> getSubscriptions(final String id) {
         Assert.notNull(id);
 
-        RedisSerializer<Object> serializer = new JdkSerializationRedisSerializer();
+        String object = (String) redisTemplate.opsForValue().get(id);
 
-        if (redisTemplate.hasKey(id)) {
-
-            byte[] object = (byte[]) redisTemplate.opsForValue().get(id);
-
-            List<Subscription> list = (List<Subscription>) serializer.deserialize(object);
+        try {
+            List<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
+            });
 
             return list;
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return null;
@@ -43,12 +47,16 @@ public class SubscriptionPersister {
 
     public void persistSubscription(final String id, Subscription subscription) {
 
-        RedisSerializer<Object> serializer = new JdkSerializationRedisSerializer();
-        List<Subscription> list = Arrays.asList(subscription);
+        List<Subscription> list = this.getSubscriptions(id);
+        list.add(subscription);
 
-        byte[] serialized = serializer.serialize(list);
+        try {
+            String jsonInString = mapper.writeValueAsString(list);
+            redisTemplate.opsForValue().set(id, jsonInString);
 
-        redisTemplate.opsForValue().set(id, serialized);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
     }
 }
