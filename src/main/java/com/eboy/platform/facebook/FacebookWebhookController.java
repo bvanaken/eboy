@@ -31,7 +31,7 @@ public class FacebookWebhookController {
         this.facebookHelper = facebookHelper;
     }
 
-    @RequestMapping(value = "/webhook", method = GET, params = "hub.mode=subscribe")
+    @RequestMapping(value = "/fb/webhook", method = GET, params = "hub.mode=subscribe")
     public
     @ResponseBody
     String verifySubscription(@RequestParam("hub.challenge") String challenge,
@@ -40,7 +40,7 @@ public class FacebookWebhookController {
         return FB_VERIFY_TOKEN.equals(verifyToken) ? challenge : null;
     }
 
-    @RequestMapping(value = "/webhook", method = POST)
+    @RequestMapping(value = "/fb/webhook", method = POST)
     public void receiveUpdate(@RequestBody UpdateBody updateBody) throws IOException {
 
         for (Entry entry : updateBody.getEntries()) {

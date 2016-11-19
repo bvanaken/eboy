@@ -7,6 +7,7 @@ import com.eboy.platform.MessageType;
 import com.eboy.platform.facebook.message.*;
 import com.eboy.platform.facebook.update.Member;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,10 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @Service
+@Qualifier(value = FacebookMessageService.QUALIFIER)
 public class FacebookMessageService implements MessageService {
+
+    public static final String QUALIFIER = "FacebookMessageService";
 
     private final static Logger logger = Logger.getLogger(FacebookMessageService.class.getName());
 

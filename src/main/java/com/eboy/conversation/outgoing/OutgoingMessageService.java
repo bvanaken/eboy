@@ -6,7 +6,9 @@ import com.eboy.conversation.outgoing.dto.MessagePayload;
 import com.eboy.nlp.Intent;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.MessageType;
+import com.eboy.platform.telegram.TelegramMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -22,7 +24,7 @@ public class OutgoingMessageService {
     private Map<String, List<MessageEntry>> generalMessageMap;
 
     @Autowired
-    public OutgoingMessageService(MessageService messageService, OutgoingMessageHelper messageHelper) {
+    public OutgoingMessageService(@Qualifier(TelegramMessageService.QUALIFIER) MessageService messageService, OutgoingMessageHelper messageHelper) {
         this.messageService = messageService;
         this.messageHelper = messageHelper;
 
