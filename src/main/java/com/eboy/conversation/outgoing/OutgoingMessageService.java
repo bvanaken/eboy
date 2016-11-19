@@ -23,8 +23,7 @@ public class OutgoingMessageService {
 
     private Map<String, List<MessageEntry>> generalMessageMap;
 
-    @Autowired
-    public OutgoingMessageService(@Qualifier(TelegramMessageService.QUALIFIER) MessageService messageService, OutgoingMessageHelper messageHelper) {
+    public OutgoingMessageService(MessageService messageService, OutgoingMessageHelper messageHelper) {
         this.messageService = messageService;
         this.messageHelper = messageHelper;
 
@@ -140,7 +139,7 @@ public class OutgoingMessageService {
         return null;
     }
 
-    private String getMessageForKey(final String key, final String[] params) {
+    public String getMessageForKey(final String key, final String[] params) {
         Assert.notNull(key);
 
         Map<String, List<MessageEntry>> messageMap = this.messageMapForKey(key);

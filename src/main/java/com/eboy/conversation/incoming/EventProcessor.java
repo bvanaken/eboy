@@ -3,6 +3,9 @@ package com.eboy.conversation.incoming;
 import com.eboy.conversation.outgoing.OutgoingMessageService;
 import com.eboy.nlp.Intent;
 import com.eboy.platform.Platform;
+import com.eboy.event.IntentEvent;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +20,19 @@ public class EventProcessor {
     private MessageProcessor messageProcessor;
 
     @Autowired
-    public EventProcessor(OutgoingMessageService messageService, MessageProcessor messageProcessor) {
+    public EventProcessor(OutgoingMessageService messageService, MessageProcessor messageProcessor, EventBus eventBus) {
         this.messageService = messageService;
         this.messageProcessor = messageProcessor;
-
     }
 
     public void onStartEvent(final String senderId, final Platform platform) {
 
 
+    }
+
+    @Subscribe
+    public void handleIntentEvent(IntentEvent intent) {
+        logger.info("Event received: " + intent.message);
     }
 
     public void onLoginEvent(final Long appUserId, final String senderId, final Platform platform) {

@@ -35,6 +35,8 @@ dependencies {
 
     compile files('lib/libai.jar')
     compile 'com.github.pengrad:java-telegram-bot-api:2.1.4'
+    compile group: 'com.google.guava', name: 'guava', version: '11.0.2'
+    compile group: 'org.zalando.stups', name: 'spring-boot-starter-guava-eventbus', version: '0.5.4'
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
