@@ -12,17 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class EbayAdService {
 
+    private final static Logger logger = Logger.getLogger(EbayAdService.class.getName());
+
     final String BASE_STRING = "https://api.ebay-kleinanzeigen.de/api/ads.json?q=";
     final String FIELDS = "&_in=price,ad-type,title,description,ad-address,ad-status,start-date-time,link,pictures";
 
-
-
-    final String username = "";
-    final String password = "";
+    final String username = "ebayk_hackathon_chatbot";
+    final String password = "cf73e71aa2721eba";
 
     RestTemplate restTemplate;
 
@@ -39,15 +40,22 @@ public class EbayAdService {
             url += keyword + "%20";
         }
 
-        url = url.substring(0, url.length() - 1);
+        // delete the last %20
+        url = url.substring(0, url.length() - 3);
+        url += FIELDS;
 
         HttpHeaders headers = createHeaders(username, password);
 
         HttpEntity<String> request = new HttpEntity<String>(headers);
         ResponseEntity<EbayResponse> response = restTemplate.exchange(url, HttpMethod.GET, request, EbayResponse.class);
-        EbayResponse account = response.getBody();
 
-        return null;
+        EbayResponse responseBody = response.getBody();
+
+        logger.info("Ebay URL requested: " + url);
+        logger.info("resp: " + responseBody);
+
+        return responseBody.getAdsObject().getAdsValue().getAds();
+
     }
 
     HttpHeaders createHeaders(String username, String password) {

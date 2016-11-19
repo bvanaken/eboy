@@ -2,12 +2,12 @@ package com.eboy.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AdsValue {
 
     @JsonProperty("ad")
-    List<Ad> ads;
+    ArrayList<Ad> ads;
 
     @JsonProperty
     Paging paging;
@@ -15,7 +15,7 @@ public class AdsValue {
     public AdsValue() {
     }
 
-    public List<Ad> getAds() {
+    public ArrayList<Ad> getAds() {
         return ads;
     }
 
