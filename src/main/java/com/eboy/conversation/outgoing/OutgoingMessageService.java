@@ -3,92 +3,64 @@ package com.eboy.conversation.outgoing;
 import com.eboy.conversation.outgoing.dto.Button;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.conversation.outgoing.dto.MessagePayload;
+import com.eboy.event.IntentEvent;
 import com.eboy.nlp.Intent;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.MessageType;
+import com.eboy.platform.Platform;
+import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
+import com.eboy.platform.telegram.TelegramWebhookController;
+import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 @Service
 public class OutgoingMessageService {
 
     private final String GENERAL_PREFIX = "general";
-    private MessageService messageService;
+    private MessageService facebookMessageService;
+    private MessageService telegramMessageService;
     private OutgoingMessageHelper messageHelper;
 
     private Map<String, List<MessageEntry>> generalMessageMap;
 
+    private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
+
     @Autowired
-    public OutgoingMessageService(MessageService messageService, OutgoingMessageHelper messageHelper) {
-        this.messageService = messageService;
+    public OutgoingMessageService(@Qualifier(FacebookMessageService.QUALIFIER) MessageService facebookMessageService, @Qualifier(TelegramMessageService.QUALIFIER) MessageService telegramMessageService, OutgoingMessageHelper messageHelper) {
+        this.facebookMessageService = facebookMessageService;
+        this.telegramMessageService = telegramMessageService;
         this.messageHelper = messageHelper;
 
         this.generalMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.GENERAL);
     }
 
-    public void sendText(final String text, final String userId) {
-        messageService.sendTextMessage(text, userId);
-    }
-
-    public void sendImage(String image, final String userId) {
-
-        messageService.sendAttachment(image, MessageType.IMAGE, userId);
-    }
-
-    public void sendLoginRequest(final String text, String image, final String userId) {
-
-        // Check if text is key for MessageMaps
-        Optional<String> textFromKey = Optional.ofNullable(this.getMessageForKey(text, null));
-
-        messageService.sendLoginTemplate(textFromKey.orElse(text), image, userId);
-    }
-
-    public void sendImageWithText(final String text, final String image, final String userId) {
-        this.sendText(text, userId);
-        this.sendImage(image, userId);
-    }
-
-    public void sendQuickReplies(final String text, final Object[] replyArray, final String userId) {
-        Assert.notNull(replyArray);
-        Assert.notNull(userId);
-        Assert.isTrue(replyArray.length % 2 == 0, "Odd number in quick replies array not allowed.");
-
-        HashMap<String, Intent> quickReplies = new HashMap<>();
-
-        // Put Reply-Array into Hashmap
-        for (int i = 0; i <= replyArray.length / 2; i = i + 2) {
-            quickReplies.put((String) replyArray[i], (Intent) replyArray[i + 1]);
+    public void sendText(String text, String userId, Platform platform) {
+        if (platform.equals(Platform.FACEBOOK)) {
+            facebookMessageService.sendTextMessage(text, userId);
+        } else {
+            telegramMessageService.sendTextMessage(text, userId);
         }
-
-        // Check if text is key for MessageMaps
-        Optional<String> textFromKey = Optional.ofNullable(this.getMessageForKey(text, null));
-
-        messageService.sendQuickReplies(textFromKey.orElse(text), quickReplies, userId);
     }
 
-    public void sendGalleryWithImageAndButtons(final List<String> titles, final List<String> subTitles, List<String> imageUrls, final List<List<Button>> buttons, final String userId) {
-        Assert.notNull(titles);
-        Assert.notNull(subTitles);
-        Assert.notNull(imageUrls);
-        Assert.notNull(buttons);
-        Assert.notNull(userId);
-        Assert.isTrue(titles.size() == subTitles.size(), "Element lists size must be the same");
-        Assert.isTrue(titles.size() == imageUrls.size(), "Element lists size must be the same");
-        Assert.isTrue(titles.size() == buttons.size(), "Element lists size must be the same");
 
-        messageService.sendGenericTemplate(titles, subTitles, imageUrls, buttons, userId);
-    }
+    @Subscribe
+    public void handleEvent(IntentEvent event) {
+        Assert.notNull(event.key);
+        Assert.notNull(event.userId);
 
-    public void sendMessageForKey(final String key, final String userId, final String[] params) {
-        Assert.notNull(key);
-        Assert.notNull(userId);
+        logger.info("handle event: " + event.key);
 
-        Map<String, List<MessageEntry>> messageMap = this.messageMapForKey(key);
+        String key = event.key;
+        Long userId = event.userId;
+
+        Map<String, List<MessageEntry>> messageMap = this.generalMessageMap;
 
         if (messageMap != null) {
 
@@ -101,49 +73,17 @@ public class OutgoingMessageService {
                 int index = rand.nextInt(messageEntries.size());
 
                 MessageEntry messageEntry = messageEntries.get(index);
+                String text = messageEntry.getText();
 
-                MessagePayload payload = messageEntry.getPayload();
-                String text = messageHelper.fillInPatterns(messageEntry.getText(), params);
-
-                if (payload != null && payload.getUrl() != null) {
-
-                    switch (payload.getType()) {
-                        case IMAGE:
-                            this.sendImageWithText(text, payload.getUrl(), userId);
-                            break;
-                    }
-
-                } else {
-
-                    this.sendText(text, userId);
-                }
+                this.sendText(text, String.valueOf(userId), event.platform);
             }
         }
     }
 
-    public void sendMessageForKey(final String key, final String userId) {
-        this.sendMessageForKey(key, userId, null);
-    }
-
-    private Map<String, List<MessageEntry>> messageMapForKey(final String key) {
-        try {
-            String domain = key.split("_")[0];
-
-            switch (domain) {
-                case GENERAL_PREFIX:
-                    return generalMessageMap;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getMessageForKey(final String key, final String[] params) {
+    private String getMessageForKey(final String key, final String[] params) {
         Assert.notNull(key);
 
-        Map<String, List<MessageEntry>> messageMap = this.messageMapForKey(key);
+        Map<String, List<MessageEntry>> messageMap = this.generalMessageMap;
 
         if (messageMap != null) {
 

@@ -8,11 +8,12 @@ import com.eboy.platform.Platform;
 public class IntentEvent {
 
     public Long userId;
-    public String message;
+    public String key;
     public Platform platform;
 
-    public IntentEvent(Long userId, String message) {
+    public IntentEvent(Long userId, String key, Platform platform) {
         this.userId = userId;
-        this.message = message;
+        this.key = key;
+        this.platform = platform;
     }
 }

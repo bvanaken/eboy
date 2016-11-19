@@ -55,7 +55,7 @@ public class EventProcessor {
 
     public void onIntentNotDetected(String senderId, Platform platform) {
 
-        messageService.sendMessageForKey("general_did_not_understand", senderId);
+        /*messageService.sendMessageForKey("general_did_not_understand", senderId);*/
 
     }
 

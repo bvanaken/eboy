@@ -2,6 +2,9 @@ package com.eboy.nlp.luis;
 
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.TextProcessor;
+import com.eboy.nlp.luis.model.LuisIntent;
+import com.eboy.nlp.luis.model.LuisQueryResponse;
+import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,9 @@ import java.util.logging.Logger;
 
 @Service
 public class LuisProcessor implements TextProcessor {
+
+    @Autowired
+    private EventBus eventBus;
 
     public static final String QUALIFIER = "LuisProcessor";
     private final static Logger logger = Logger.getLogger(LuisProcessor.class.getName());

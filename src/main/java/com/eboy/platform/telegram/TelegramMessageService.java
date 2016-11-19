@@ -31,17 +31,17 @@ public class TelegramMessageService implements MessageService {
     public void sendTextMessage(final String text, final String userId) {
         TelegramBot bot = TelegramBotAdapter.build(TOKEN);
 
-        SendMessage message = new SendMessage(text, userId).parseMode(ParseMode.Markdown);
+        SendMessage message = new SendMessage(userId, text).parseMode(ParseMode.Markdown);
 
         bot.execute(message, new Callback<SendMessage, com.pengrad.telegrambot.response.SendResponse>() {
             @Override
             public void onResponse(SendMessage request, com.pengrad.telegrambot.response.SendResponse response) {
-
+                logger.info(response.toString());
             }
 
             @Override
             public void onFailure(SendMessage request, IOException e) {
-
+                logger.warning(e.getLocalizedMessage());
             }
         });
     }
