@@ -38,5 +38,8 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '11.0.2'
     compile group: 'org.zalando.stups', name: 'spring-boot-starter-guava-eventbus', version: '0.5.4'
 
+    compile ("org.springframework.data:spring-data-redis:1.7.4.RELEASE")
+    compile ("redis.clients:jedis:2.5.1")
+
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
