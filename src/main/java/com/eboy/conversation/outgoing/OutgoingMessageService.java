@@ -7,33 +7,19 @@ import com.eboy.nlp.Intent;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.MessageType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class OutgoingMessageService {
 
-    @Value("${image.url}")
-    private String IMAGE_BASE_URL;
-
     private final String GENERAL_PREFIX = "general";
-    private final String ONBOARDING_PREFIX = "start";
-    private final String ANIMALS_PREFIX = "animals";
-    private final String MARKET_PREFIX = "market";
-    private final String FAQ_PREFIX = "faq";
-
     private MessageService messageService;
     private OutgoingMessageHelper messageHelper;
 
     private Map<String, List<MessageEntry>> generalMessageMap;
-    private Map<String, List<MessageEntry>> startMessageMap;
-    private Map<String, List<MessageEntry>> animalsMessageMap;
-    private Map<String, List<MessageEntry>> marketMessageMap;
-    private Map<String, List<MessageEntry>> faqMessageMap;
 
     @Autowired
     public OutgoingMessageService(MessageService messageService, OutgoingMessageHelper messageHelper) {
@@ -41,10 +27,6 @@ public class OutgoingMessageService {
         this.messageHelper = messageHelper;
 
         this.generalMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.GENERAL);
-        this.startMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.ONBOARDING);
-        this.animalsMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.ANIMALS);
-        this.marketMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.MARKET);
-        this.faqMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.FAQ);
     }
 
     public void sendText(final String text, final String userId) {
@@ -52,17 +34,11 @@ public class OutgoingMessageService {
     }
 
     public void sendImage(String image, final String userId) {
-        if (messageHelper.isRelativeUrl(image)) {
-            image = IMAGE_BASE_URL + image;
-        }
 
         messageService.sendAttachment(image, MessageType.IMAGE, userId);
     }
 
     public void sendLoginRequest(final String text, String image, final String userId) {
-        if (messageHelper.isRelativeUrl(image)) {
-            image = IMAGE_BASE_URL + image;
-        }
 
         // Check if text is key for MessageMaps
         Optional<String> textFromKey = Optional.ofNullable(this.getMessageForKey(text, null));
@@ -102,13 +78,6 @@ public class OutgoingMessageService {
         Assert.isTrue(titles.size() == subTitles.size(), "Element lists size must be the same");
         Assert.isTrue(titles.size() == imageUrls.size(), "Element lists size must be the same");
         Assert.isTrue(titles.size() == buttons.size(), "Element lists size must be the same");
-
-        // Check for relative imageUrls (assuming they are all of the same kind)
-        if (imageUrls.size() > 0) {
-            if (messageHelper.isRelativeUrl(imageUrls.get(0))) {
-                imageUrls = imageUrls.stream().map(url -> IMAGE_BASE_URL + url).collect(Collectors.toList());
-            }
-        }
 
         messageService.sendGenericTemplate(titles, subTitles, imageUrls, buttons, userId);
     }
@@ -161,14 +130,6 @@ public class OutgoingMessageService {
             switch (domain) {
                 case GENERAL_PREFIX:
                     return generalMessageMap;
-                case ONBOARDING_PREFIX:
-                    return startMessageMap;
-                case ANIMALS_PREFIX:
-                    return animalsMessageMap;
-                case MARKET_PREFIX:
-                    return marketMessageMap;
-                case FAQ_PREFIX:
-                    return faqMessageMap;
             }
 
         } catch (Exception e) {
