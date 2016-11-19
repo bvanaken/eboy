@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Service
+@Component
 @Qualifier(value = TelegramMessageService.QUALIFIER)
 public class TelegramMessageService implements MessageService {
 
