@@ -23,6 +23,7 @@ public class OutgoingMessageService {
 
     private Map<String, List<MessageEntry>> generalMessageMap;
 
+    @Autowired
     public OutgoingMessageService(MessageService messageService, OutgoingMessageHelper messageHelper) {
         this.messageService = messageService;
         this.messageHelper = messageHelper;
