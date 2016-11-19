@@ -4,13 +4,14 @@ import com.eboy.data.EbayAdService;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
 import com.eboy.platform.Platform;
-import com.eboy.redis.SubscriptionPersister;
-import com.eboy.redis.model.Subscription;
+import com.eboy.subscriptions.SubscriptionPersister;
+import com.eboy.subscriptions.model.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -51,7 +52,7 @@ public class BaseController {
 
         String key = "hey";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, 12345L, "keywords", 12.4f));
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(), "keywords", 12.4f));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }

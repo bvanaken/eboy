@@ -1,21 +1,22 @@
-package com.eboy.redis.model;
+package com.eboy.subscriptions.model;
 
 import com.eboy.platform.Platform;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Subscription implements Serializable {
 
     Long userId;
     Platform platform;
-    Long lastAd;
+    Date lastAd;
     String keywords;
     Float price;
 
     public Subscription() {
     }
 
-    public Subscription(Long userId, Platform platform, Long lastAd, String keywords, Float price) {
+    public Subscription(Long userId, Platform platform, Date lastAd, String keywords, Float price) {
         this.userId = userId;
         this.platform = platform;
         this.lastAd = lastAd;
@@ -31,7 +32,7 @@ public class Subscription implements Serializable {
         return platform;
     }
 
-    public Long getLastAd() {
+    public Date getLastAd() {
         return lastAd;
     }
 
@@ -41,6 +42,10 @@ public class Subscription implements Serializable {
 
     public Float getPrice() {
         return price;
+    }
+
+    public void setLastAd(Date lastAd) {
+        this.lastAd = lastAd;
     }
 
     @Override

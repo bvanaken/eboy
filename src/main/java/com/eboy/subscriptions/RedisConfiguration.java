@@ -1,4 +1,4 @@
-package com.eboy.redis;
+package com.eboy.subscriptions;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,6 @@
-package com.eboy.redis;
+package com.eboy.subscriptions;
 
-import com.eboy.redis.model.Subscription;
+import com.eboy.subscriptions.model.Subscription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SubscriptionPersister {
@@ -28,10 +30,10 @@ public class SubscriptionPersister {
         this.mapper = new ObjectMapper();
     }
 
-    public List<Subscription> getSubscriptions(final String id) {
-        Assert.notNull(id);
+    public List<Subscription> getSubscriptions(final String key) {
+        Assert.notNull(key);
 
-        String object = (String) redisTemplate.opsForValue().get(id);
+        String object = (String) redisTemplate.opsForValue().get(key);
 
         try {
             List<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
@@ -45,14 +47,44 @@ public class SubscriptionPersister {
         return null;
     }
 
-    public void persistSubscription(final String id, Subscription subscription) {
+    public Set<String> getKeys() {
 
-        List<Subscription> list = this.getSubscriptions(id);
+        Set<String> keys = redisTemplate.keys("*");
+
+        return keys;
+    }
+
+    public void persistSubscription(final String key, Subscription subscription) {
+
+        List<Subscription> list = this.getSubscriptions(key);
+
+        if (list == null) {
+            list = new ArrayList<>();
+        }
         list.add(subscription);
 
         try {
             String jsonInString = mapper.writeValueAsString(list);
-            redisTemplate.opsForValue().set(id, jsonInString);
+            redisTemplate.opsForValue().set(key, jsonInString);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void persistSubscriptions(final String key, List<Subscription> subscriptions) {
+
+        List<Subscription> list = this.getSubscriptions(key);
+
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        list.addAll(subscriptions);
+
+        try {
+            String jsonInString = mapper.writeValueAsString(list);
+            redisTemplate.opsForValue().set(key, jsonInString);
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
