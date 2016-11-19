@@ -2,6 +2,7 @@ package com.eboy;
 
 import com.eboy.data.EbayAdService;
 import com.eboy.data.MsTextAnalyticService;
+import com.eboy.mv.ComputerVision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,11 +16,13 @@ public class BaseController {
 
     MsTextAnalyticService textAnalyser;
     EbayAdService adService;
+    ComputerVision imageAnalyzer;
 
     @Autowired
-    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer) {
+    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer) {
         this.textAnalyser = textAnalyzer;
         this.adService = adService;
+        this.imageAnalyzer = imageAnalyzer;
     }
 
     @RequestMapping("/")
@@ -55,6 +58,14 @@ public class BaseController {
             "  ]\n" +
             "}";
         return this.textAnalyser.analyze(text);
+    }
+
+    @RequestMapping("/analyzeImage")
+    public String getCategorieOfAnImage() {
+        return this.imageAnalyzer.analyzeImage(
+                //TODO: image url should be the telegram fileserver image url sent to the chatbot.
+                "{\"url\": \"http://assets.inhabitat.com/wp-content/blogs.dir/1/files/2015/12/Fortified-Bicycle-Invincible-Theft-Proof-Bike-10.jpg\"}"
+        );
     }
 }
 

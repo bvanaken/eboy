@@ -1,17 +1,12 @@
 package com.eboy.data;
 
-import com.eboy.data.dto.Ad;
-import com.eboy.data.dto.EbayResponse;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 
 /**
  * Created by alex on 19.11.16.
