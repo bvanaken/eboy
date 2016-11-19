@@ -47,18 +47,6 @@ public class OutgoingMessageHelper {
             case GENERAL:
                 resource = generalDomain;
                 break;
-            case ONBOARDING:
-                resource = onBoardingDomain;
-                break;
-            case ANIMALS:
-                resource = animalDomain;
-                break;
-            case MARKET:
-                resource = marketDomain;
-                break;
-            case FAQ:
-                resource = faqDomain;
-                break;
             default:
                 return null;
         }
