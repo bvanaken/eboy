@@ -1,4 +1,4 @@
-package com.eboy.data;
+package com.eboy.data.MsAnalyticService;
 
 import com.eboy.data.dto.Ad;
 import com.eboy.data.dto.EbayResponse;
@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -29,22 +31,36 @@ public class MsTextAnalyticService {
         this.restTemplate = restTemplate;
     }
 
-    public String analyze(String body) {
+    public String analyzeStrings(String[] strings) {
+        String  documents = " {\"documents\": [";
+        for (int i = 0; i < strings.length; i++) {
+            documents = documents + new AnalyticsDocument(i, strings[i]).toJSON()+", ";
+        }
+        return this.analyze(documents + "]}");
+    }
+
+    public String analyzeAds(List<Ad> ads) {
+        String  documents = " {\"documents\": [";
+        for (int i = 0; i < ads.size(); i++) {
+            String description = ads.get(i).getDescription().getValueAsString();
+            documents = documents + new AnalyticsDocument(ads.get(i).getId(), description).toJSON() +", ";
+        }
+        return this.analyze(documents + "]}");
+    }
+
+    private String analyze(String body) {
 
         String url = BASE_STRING;
 
         String apiKey = "52216691a2ec443a97bd36103d9b8630";
-
         HttpHeaders headers = createHeaders(apiKey);
 
-
-        HttpEntity<String> request = new HttpEntity<String>(body,headers);
+        HttpEntity<String> request = new HttpEntity<String>(body, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity( url, request , String.class );
-        String account = response.getBody();
+        String resJSON = response.getBody();
 
-        return account;
-
+        return resJSON;
     }
 
     HttpHeaders createHeaders(String apiKey) {
@@ -55,4 +71,6 @@ public class MsTextAnalyticService {
 
         return headers;
     }
+    
+
 }
