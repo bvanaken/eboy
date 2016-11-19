@@ -14,6 +14,8 @@ public class Field {
         return value;
     }
 
+    public String getValueAsString() { return value.toString(); }
+
     @Override
     public String toString() {
         return "Field{" +

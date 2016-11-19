@@ -1,7 +1,11 @@
 package com.eboy;
 
 import com.eboy.data.EbayAdService;
-import com.eboy.data.MsTextAnalyticService;
+import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
+import com.eboy.data.dto.Ad;
+import com.eboy.platform.Platform;
+import com.eboy.redis.SubscriptionPersister;
+import com.eboy.redis.model.Subscription;
 import com.eboy.mv.ComputerVision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,19 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @RestController
 public class BaseController {
 
     MsTextAnalyticService textAnalyser;
     EbayAdService adService;
     ComputerVision imageAnalyzer;
+    SubscriptionPersister persister;
 
     @Autowired
-    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer) {
+    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer, SubscriptionPersister persister) {
         this.textAnalyser = textAnalyzer;
         this.adService = adService;
         this.imageAnalyzer = imageAnalyzer;
+        this.persister = persister;
     }
 
     @RequestMapping("/")
@@ -43,21 +48,31 @@ public class BaseController {
         return adService.getAdsForKeywords(keywords);
     }
 
-    @RequestMapping("/analyze")
-    public String getAnalyse() {
+    @RequestMapping("/subscribe")
+    public void subscribe() {
 
+        String key = "hey";
+
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, 12345L, "keywords", 12.4f));
+
+        System.out.println("result: " + persister.getSubscriptions(key));
+    }
+
+    @RequestMapping("/analyze")
+    public String getAnalyseStrings() {
 
         /* Test JSON-String */
-        String text = "{\n" +
-            "  \"documents\": [\n" +
-            "    {\n" +
-            "      \"language\": \"en\",\n" +
-            "      \"id\": \"0\",\n" +
-            "      \"text\": \"CHRISSON VINTAGE ROAD 1.0 zeichnet sich durch eine unverwechselbare Retro Optik, leichter VINTAGE HI TEN Rahmen in matt mit dezenten Unterlack Dekoren, kraftvollen DUAL PIVOT Bremsen (Alukörper) von PROMAX, qulitative Alukurbel A070 von SHIMANO, 14 Gang A050/A070 SHIMANO Schaltung, Rennsattel von Selle Montegrappa und vieles mehr in nur 10,7kg... Die Bereifung SCHWALBE LUGANO (bis 9 Bar und Kevlar Guard) in schwarz creme macht das Fahrrad absolut vollkommen!\"\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}";
-        return this.textAnalyser.analyze(text);
+        String[] text = new String[]{"Macbook Pro Mid 2014, Retina i5 2.8 GHz,512 GB SSD, Top Zustand",
+                "Verkaufe meinen Macbook Retina Pro 13 von mitte 2014. Das Gerät ist wie neu, keinerlei...",
+                "MacBook Pro 13 Zoll Retina 2014 + Magic Mouse2"};
+        return this.textAnalyser.analyzeStrings(text);
+    }
+
+    @RequestMapping("/analyze-ads")
+    public String getAnalyseAds() {
+
+        List<Ad> ads = this.getAds();
+        return this.textAnalyser.analyzeAds(ads);
     }
 
     @RequestMapping("/analyzeImage")
