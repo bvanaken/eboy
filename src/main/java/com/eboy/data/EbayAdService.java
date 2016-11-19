@@ -40,16 +40,14 @@ public class EbayAdService {
             url += keyword + " ";
         }
 
-        // delete the last %20
+        // delete the last space
         url = url.substring(0, url.length() - 1);
         url += FIELDS;
 
         HttpHeaders headers = createHeaders(username, password);
 
-        HttpEntity<String> request = new HttpEntity<String>(headers);
-
+        HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<EbayResponse> response = restTemplate.exchange(url, HttpMethod.GET, request, EbayResponse.class);
-
         EbayResponse responseBody = response.getBody();
 
         logger.info("Ebay URL requested: " + url);

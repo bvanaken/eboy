@@ -11,7 +11,7 @@ public class LuisEntity {
     private String type;
 
     @JsonProperty
-    private Long score;
+    private Float score;
 
     public LuisEntity() {
     }
@@ -24,7 +24,7 @@ public class LuisEntity {
         return type;
     }
 
-    public Long getScore() {
+    public Float getScore() {
         return score;
     }
 

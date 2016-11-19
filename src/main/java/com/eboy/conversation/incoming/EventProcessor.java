@@ -30,18 +30,11 @@ public class EventProcessor {
 
     }
 
-    @Subscribe
-    public void handleIntentEvent(IntentEvent intent) {
-        logger.info("Event received: " + intent.message);
-    }
-
     public void onLoginEvent(final Long appUserId, final String senderId, final Platform platform) {
-
 
     }
 
     public void onUserMessageEvent(final String text, final String senderId, final Platform platform) {
-
 
     }
 
