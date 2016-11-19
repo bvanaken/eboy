@@ -35,7 +35,6 @@ public class EventProcessor {
 
     public void onUserMessageEvent(final String text, final String senderId, final Platform platform) {
 
-
     }
 
     public void onUserPostbackEvent(String payload, String senderId, Platform platform) {

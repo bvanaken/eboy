@@ -1,7 +1,7 @@
 package com.eboy.nlp.luis;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.eboy.nlp.Intent;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LuisIntent {
 
@@ -9,7 +9,7 @@ public class LuisIntent {
     private Intent intent;
 
     @JsonProperty
-    private Long score;
+    private Float score;
 
     public LuisIntent() {
     }
@@ -18,7 +18,7 @@ public class LuisIntent {
         return intent;
     }
 
-    public Long getScore() {
+    public Float getScore() {
         return score;
     }
 
