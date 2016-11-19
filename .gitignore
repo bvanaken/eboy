@@ -1,0 +1,10 @@
+build/
+out/
+.gradle/
+.idea/*
+*.iml
+/bin/
+.DS_Store
+/.classpath
+/.project
+/.settings

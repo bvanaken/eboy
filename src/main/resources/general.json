@@ -1,0 +1,34 @@
+{
+  "general_did_not_understand": [
+    {
+      "text": "Baah, I'm just a goat and cannot understand all human dialects. Please tell me again in other words.",
+      "payload": {}
+    },
+    {
+      "text": "What was that?",
+      "payload": {}
+    },
+    {
+      "text": "Baah, I didn't get that. Can you repeat that in more goat-friendly words?",
+      "payload": {}
+    }
+  ],
+  "general_react_to_refusal": [
+    {
+      "text": "Alright, maybe next time.",
+      "payload": {}
+    },
+    {
+      "text": "No problem, you can still ask for it later.",
+      "payload": {}
+    },
+    {
+      "text": "Okie doke.",
+      "payload": {}
+    },
+    {
+      "text": "Okay, maybe later then.",
+      "payload": {}
+    }
+  ]
+}
