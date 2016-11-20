@@ -314,6 +314,7 @@ public class OutgoingMessageService {
         sb.append("<b>I think it is noteworthy because: </b>" + this.getRandomKeyPhrase(ad));
         sb.append(NEW_LINE);
         sb.append(NEW_LINE);
+        sb.append(ad.getPublicPicture());
         return sb.toString();
     }
 
@@ -377,10 +378,9 @@ public class OutgoingMessageService {
         String[] keyphrases = ad.getKeyPhrases();
         for (int i = 0; i < positives.length; i++) {
             for (int j = 0; j < keyphrases.length; j++) {
-                if (positives[i].contains(keyphrases[i].toLowerCase())) {
-                    return keyphrases[i];
+                if (positives[i].contains(keyphrases[j].toLowerCase())) {
+                    return keyphrases[j];
                 }
-                ;
             }
         }
 
