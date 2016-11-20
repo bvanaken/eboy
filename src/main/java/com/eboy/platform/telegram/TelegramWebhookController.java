@@ -5,16 +5,25 @@ import com.eboy.data.EbayAdService;
 import com.eboy.data.dto.Ad;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.LatestAdEvent;
+import com.eboy.mv.ComputerVision;
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.LuisProcessor;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.update.Event;
 import com.eboy.platform.telegram.model.Message;
 import com.eboy.platform.telegram.model.MessageEntity;
+import com.eboy.platform.telegram.model.TelegramFile;
+import com.eboy.platform.telegram.model.response.FileResponse;
 import com.google.common.eventbus.EventBus;
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.TelegramBotAdapter;
+import com.pengrad.telegrambot.model.File;
+import com.pengrad.telegrambot.response.GetFileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +44,12 @@ public class TelegramWebhookController {
     @Autowired
     private EbayAdService ebayAdService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private ComputerVision imageAnalyzer;
+
     private final static Logger logger = Logger.getLogger(TelegramWebhookController.class.getName());
 
     @RequestMapping(value = "/telegram/webhook", method = POST)
@@ -46,35 +61,49 @@ public class TelegramWebhookController {
 
         Message message = update.getMessage();
         boolean isTextMessage = message.getText() != null;
-        boolean isPhotoMessage = message.getPhoto() != null;
+        boolean isPhotoMessage = message.getPhoto() != null && message.getPhoto().length > 0;
 
-        if(isTextMessage) {
+        if (isTextMessage) {
             // do luis stuff
             return;
-        }else{
-            if(isPhotoMessage) {
-                // do image recognition
+        } else {
+            if (isPhotoMessage) {
+                handleTelegramPhoto(message);
                 return;
             }
+            // rip
             return;
         }
+    }
 
-        /*Intent intent = luisProcessor.getIntentFromText();
+    private void handleTelegramPhoto(Message message) {
+        // do image recognition
+        // getFile from telegram
 
-        MessageEntity[] entities = update.getMessage().getEntities();*/
+        TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
+        int length = message.getPhoto().length;
+        TelegramFile[] photo = message.getPhoto();
+        TelegramFile telegramFile = photo[length - 1];
 
-        /*List<String> keywords = new ArrayList<String>();
-        keywords.add(text);
+        String fileId = telegramFile.fileId;
 
-        List<Ad> adsForKeywords = ebayAdService.getAdsForKeywords(keywords);
+        String getFileUrl = Constants.getFileUrl(fileId);
 
-        Ad latestAd = adsForKeywords.get(0);
+        ResponseEntity<FileResponse> entity = restTemplate.getForEntity(getFileUrl, FileResponse.class);
 
-        if(latestAd==null) {
-            return;
-        }
+        String filePath = entity.getBody().result.filePath;
 
-        LatestAdEvent event = new LatestAdEvent(chatId, latestAd, Platform.TELEGRAM);
-        eventBus.post(event);*/
+        String fileUrl = Constants.getFilePath(filePath);
+
+        String keyword = imageAnalyzer.analyzeImage(fileUrl);
+
+        logger.info(keyword);
+
+        /*GetFileResponse file = bot.getFile(telegramFile.fileId);*/
+        /*file.file().filePath();*/
+    }
+
+    public String getUrlObject(String filePath) {
+        return "{\"url\":" + filePath + "}";
     }
 }

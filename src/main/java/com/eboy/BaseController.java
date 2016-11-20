@@ -78,6 +78,7 @@ public class BaseController {
 
     @RequestMapping("/analyzeImage")
     public String getCategorieOfAnImage() {
+        this.imageAnalyzer.analyzeImage()
         return this.imageAnalyzer.analyzeImage(
                 //TODO: image url should be the telegram fileserver image url sent to the chatbot.
                 "{\"url\": \"http://assets.inhabitat.com/wp-content/blogs.dir/1/files/2015/12/Fortified-Bicycle-Invincible-Theft-Proof-Bike-10.jpg\"}"

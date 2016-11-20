@@ -25,11 +25,9 @@ public class TelegramMessageService implements MessageService {
 
     private final static Logger logger = Logger.getLogger(TelegramMessageService.class.getName());
 
-    private final String TOKEN = "276165906:AAFyFqmodHM-ji8nhNu0XtYBrxbT57iGcu0";
-
     @Override
     public void sendTextMessage(final String text, final String userId) {
-        TelegramBot bot = TelegramBotAdapter.build(TOKEN);
+        TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
 
         SendMessage message = new SendMessage(userId, text).parseMode(ParseMode.Markdown);
 
