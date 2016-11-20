@@ -113,10 +113,11 @@ public class OutgoingMessageService {
                 break;
             case getLocation:
                 Optional<LuisEntity> locationType = entities.stream().filter(v -> v.getType().equals("locationType")).findFirst();
-
+                String locType = locationType.get().getType();
+                if(locType.equals("locationType::districtOfBerlin")) {
+                    
+                }
                 break;
-
-
         }
     }
 
