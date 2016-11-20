@@ -56,6 +56,18 @@ public class EbayAdService {
 
     }
 
+    public Ad getLatestAd(List<String> keywords) {
+
+        List<Ad> ads = this.getAdsForKeywords(keywords);
+
+        if (ads != null && !ads.isEmpty()) {
+            return ads.get(0);
+        }
+
+        return null;
+
+    }
+
     HttpHeaders createHeaders(String username, String password) {
         String plainCreds = username + ":" + password;
         byte[] plainCredsBytes = plainCreds.getBytes();
