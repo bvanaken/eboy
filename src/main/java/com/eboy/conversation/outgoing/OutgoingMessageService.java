@@ -105,9 +105,6 @@ public class OutgoingMessageService {
                     keywords.add(entity.getEntity());
                 }
 
-
-                Subscription subscription = persister.getSubscriptionForUser(keyword, event.getUserId());
-
                 break;
             case getLocation:
                 Optional<LuisEntity> locationType = entities.stream().filter(v -> v.getType().equals("locationType")).findFirst();
