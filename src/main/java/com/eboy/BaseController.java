@@ -1,12 +1,16 @@
 package com.eboy;
 
 import com.eboy.data.EbayAdService;
+import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
+import com.eboy.data.keyPhraseModel.KeyPhraseModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +62,29 @@ public class BaseController {
 
         List<Ad> ads = this.getAds();
         return this.textAnalyser.analyzeAds(ads);
+    }
+
+    @RequestMapping("/find-mac-ssd-gold")
+    public String getMacSSD() throws IOException {
+
+        ArrayList<String> keywords = new ArrayList<>();
+        keywords.add("macbook");
+        keywords.add("ssd");
+
+        List<Ad> ads = adService.getAdsForKeywords(keywords);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json  = this.textAnalyser.analyzeAds(ads);
+        KeyPhraseModel keyPhrases = mapper.readValue( json, KeyPhraseModel.class);
+
+        ArrayList<ExtendedAd> extAds = new ArrayList<>();
+
+        for (Ad ad: ads) {
+
+            extAds.add(new ExtendedAd(ad, keyPhrases));
+        }
+
+        return "Sucess!";
     }
 }
 
