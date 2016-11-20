@@ -269,7 +269,23 @@ public class OutgoingMessageService {
 
         Tag tag = categories.get(0);
 
-        onKeywordDetected(tag.name, userId, event.platform);
+        String translation = getTranslation(tag);
+
+        onKeywordDetected(translation, userId, event.platform);
+    }
+
+    private String getTranslation(Tag tag) {
+        if (tag.name.toLowerCase().equals("bycicle")) {
+            return "Fahrrad";
+        }
+        if (tag.name.toLowerCase().equals("chair")) {
+            return "Stuhl";
+        }
+        if (tag.name.toLowerCase().equals("mouse")) {
+            return "Computermaus";
+        }
+
+        return tag.name;
     }
 
     private String getMessageForKey(final String key, final String[] params) {
