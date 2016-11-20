@@ -6,12 +6,14 @@ import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
+import com.eboy.event.NotifyEvent;
 import com.eboy.mv.ComputerVision;
 import com.eboy.platform.Platform;
 import com.eboy.subscriptions.QueryPersister;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.eboy.subscriptions.model.Subscription;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,9 @@ public class BaseController {
 
     @Autowired
     QueryPersister queryPersister;
+
+    @Autowired
+    private EventBus eventBus;
 
     @Autowired
     public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer, SubscriptionPersister persister) {
@@ -141,5 +146,15 @@ public class BaseController {
                 "{\"url\": \"http://assets.inhabitat.com/wp-content/blogs.dir/1/files/2015/12/Fortified-Bicycle-Invincible-Theft-Proof-Bike-10.jpg\"}"
         );
     }
+
+
+    @RequestMapping("/trigger-update")
+    public String getTriggerUpdate() throws IOException {
+
+        /*eventBus.post(new NotifyEvent("",""));*/
+
+        return "Sucess!";
+    }
+
 }
 

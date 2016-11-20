@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.text.NumberFormat;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -40,21 +41,21 @@ public class OutgoingMessageService {
 
     private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
     private final String GENERAL_PREFIX = "general";
+    MsTextAnalyticService textAnalyser;
     private MessageService facebookMessageService;
     private MessageService telegramMessageService;
     private OutgoingMessageHelper messageHelper;
     private SubscriptionPersister persister;
-
     @Autowired
     private QueryPersister queryPersister;
     @Autowired
     private SubscriberService subscriberService;
     @Autowired
     private EbayAdService adService;
-    MsTextAnalyticService textAnalyser;
     @Autowired
     private EventBus eventBus;
     private Map<String, List<MessageEntry>> generalMessageMap;
+    private List<Tag> tagsToKick = new ArrayList<>();
 
     @Autowired
     public OutgoingMessageService(@Qualifier(FacebookMessageService.QUALIFIER) MessageService facebookMessageService, @Qualifier(TelegramMessageService.QUALIFIER) MessageService telegramMessageService, OutgoingMessageHelper messageHelper,
@@ -65,6 +66,11 @@ public class OutgoingMessageService {
         this.persister = persister;
 
         this.generalMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.GENERAL);
+
+        tagsToKick.add(new Tag("ground"));
+        tagsToKick.add(new Tag("floor"));
+        tagsToKick.add(new Tag("indoor"));
+        tagsToKick.add(new Tag("furniture"));
     }
 
     public void sendText(String text, String userId, Platform platform) {
@@ -223,9 +229,11 @@ public class OutgoingMessageService {
 
         // instantiate QueryObject
 
-        Tag[] categories = recognition.tags;
+        List<Tag> categories = recognition.tags;
 
-        Tag tag = categories[categories.length - 1];
+        categories.removeAll(tagsToKick);
+
+        Tag tag = categories.get(0);
 
         this.sendText(tag.name, String.valueOf(userId), event.platform);
     }
@@ -255,13 +263,17 @@ public class OutgoingMessageService {
     }
 
     private String lastAdMessage(ExtendedAd ad) {
+        Double amount = (Double) ad.getPrice();
 
-        Double amount = ad.getPrice();
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        String moneyString = formatter.format(amount);
+
         StringBuilder sb = new StringBuilder();
         String NEW_LINE = "\n";
+
         sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
         sb.append(NEW_LINE);
-        sb.append("The price for the item is: " + amount + "\n");
+        sb.append("The price for the item is: " + moneyString + "€ \n");
         sb.append(NEW_LINE);
         //sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
         sb.append("I think it is noteworthy because:" + this.getRandomKeyPhrase(ad));
@@ -311,7 +323,8 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(NoClueEvent event) {
-        sendText("I have no clue what you want from me.", String.valueOf(event.getUserId()), event.platform);
+        /*sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);*/
+        sendText("http://s2.quickmeme.com/img/29/2964505b376c9cee5bd5d440d750fbd81448ed7907086a27334639ff0f009466.jpg", String.valueOf(event.getUserId()), event.platform);
     }
 
     private String getRandomKeyPhrase(ExtendedAd ad) {
