@@ -21,6 +21,8 @@ public class EbayAdService {
 
     final String BASE_STRING = "https://api.ebay-kleinanzeigen.de/api/ads.json?q=";
     final String FIELDS = "&_in=price,ad-type,title,description,ad-address,ad-status,start-date-time,link,pictures";
+    final String IS_BERLIN = "&latitude=52.5200&longitude=13.4050&distance=4";
+    final String MAX_PRICE = "&maxPrice=";
 
     final String username = "ebayk_hackathon_chatbot";
     final String password = "cf73e71aa2721eba";
@@ -32,7 +34,7 @@ public class EbayAdService {
         this.restTemplate = restTemplate;
     }
 
-    public List<Ad> getAdsForKeywords(List<String> keywords) {
+    public List<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
 
         String url = BASE_STRING;
 
@@ -43,6 +45,14 @@ public class EbayAdService {
         // delete the last space
         url = url.substring(0, url.length() - 1);
         url += FIELDS;
+
+        if (isBerlin) {
+            url += IS_BERLIN;
+        }
+
+        if (priceMax != null) {
+            url += MAX_PRICE + priceMax;
+        }
 
         HttpHeaders headers = createHeaders(username, password);
 
@@ -58,7 +68,7 @@ public class EbayAdService {
 
     public Ad getLatestAd(List<String> keywords) {
 
-        List<Ad> ads = this.getAdsForKeywords(keywords);
+        List<Ad> ads = this.getAdsForKeywords(keywords, null, null);
 
         if (ads != null && !ads.isEmpty()) {
             return ads.get(0);
@@ -66,6 +76,17 @@ public class EbayAdService {
 
         return null;
 
+    }
+
+    public Ad getLatestAdInBerlin(List<String> keywords) {
+
+        List<Ad> ads = this.getAdsForKeywords(keywords, null, true);
+
+        if (ads != null && !ads.isEmpty()) {
+            return ads.get(0);
+        }
+
+        return null;
     }
 
     HttpHeaders createHeaders(String username, String password) {

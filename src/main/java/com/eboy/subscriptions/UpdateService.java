@@ -2,6 +2,7 @@ package com.eboy.subscriptions;
 
 import com.eboy.data.EbayAdService;
 import com.eboy.data.dto.Ad;
+import com.eboy.event.NotifyEvent;
 import com.eboy.subscriptions.model.Subscription;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Component
 public class UpdateService {
@@ -32,8 +34,6 @@ public class UpdateService {
     @Scheduled(fixedDelay = 10 * 1000L)
     public void checkForUpdates() {
 
-        logger.info("execute");
-
         Set<String> keys = persister.getKeys();
 
         for (String keyword : keys) {
@@ -46,20 +46,37 @@ public class UpdateService {
                 return;
             }
 
+            // Filter berlin ones
+            List<Subscription> berlinSubscriptions = subscriptions.stream().filter(Subscription::isBerlin).collect(Collectors.toList());
+            subscriptions.removeAll(berlinSubscriptions);
+
+            // NON BERLIN SUBSCRIBERS
             Ad newestAd = adService.getLatestAd(Arrays.asList(keyword));
-
-            logger.info("newestAd: " + newestAd);
-            logger.info("oldAd: " + subscriptions.get(0).getLastAd());
-
             Long newestAdId = newestAd.getId();
+            logger.info("newestAd: " + newestAd);
 
-            // Assume all subscribers have the same last ad date
-            // Check if date is before newest ad date
+            // Assume all subscribers have the same last article
+            // Check if article is not last article
             if (!newestAdId.equals(subscriptions.get(0).getLastAd())) {
+
 
                 this.notifySubscribers(subscriptions, newestAd);
 
             }
+
+            // BERLIN SUBSCRIBERS
+            Ad newestAdBerlin = adService.getLatestAdInBerlin(Arrays.asList(keyword));
+            Long newestAdBerlinId = newestAdBerlin.getId();
+            logger.info("newestAdBerlin: " + newestAdBerlin);
+
+            // Assume all subscribers have the same last article
+            // Check if article is not last article
+            if (!newestAdBerlinId.equals(berlinSubscriptions.get(0).getLastAd())) {
+
+                this.notifySubscribers(berlinSubscriptions, newestAdBerlin);
+
+            }
+
         }
     }
 
@@ -67,12 +84,15 @@ public class UpdateService {
 
         for (Subscription subscription : subscriptions) {
 
-//            eventBus.post(new NotifyEvent(subscription.getUserId(), ad, subscription.getPlatform()));
+            // CHECK PRICE
+            if (subscription.getPrice() >= (Float) ad.getPrice().getAmount().getValue()) {
 
-            subscription.setLastAd(ad.getId());
-            persister.persistSubscription(subscription.getKeywords(), subscription);
+                eventBus.post(new NotifyEvent(subscription.getUserId(), ad, subscription.getPlatform()));
 
-            logger.info("subscriptions: " + persister.getSubscriptions(subscription.getKeywords()));
+                subscription.setLastAd(ad.getId());
+                persister.persistSubscription(subscription.getKeywords(), subscription);
+
+            }
         }
 
     }

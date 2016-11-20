@@ -13,11 +13,12 @@ public class Subscription implements Serializable {
     Long lastAd;
     String keywords;
     Float price;
+    Boolean isBerlin;
 
     public Subscription() {
     }
 
-    public Subscription(Long userId, Platform platform, Date lastAdDate, Long lastAd, String keywords, Float price) {
+    public Subscription(Long userId, Platform platform, Date lastAdDate, Long lastAd, String keywords, Float price, Boolean isBerlin) {
         this.userId = userId;
         this.platform = platform;
         this.lastAdDate = lastAdDate;
@@ -56,6 +57,10 @@ public class Subscription implements Serializable {
 
     public void setLastAdDate(Date lastAdDate) {
         this.lastAdDate = lastAdDate;
+    }
+
+    public Boolean isBerlin() {
+        return isBerlin;
     }
 
     @Override
