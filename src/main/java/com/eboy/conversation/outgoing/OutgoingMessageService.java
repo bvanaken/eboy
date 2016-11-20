@@ -6,6 +6,8 @@ import com.eboy.data.dto.Price;
 import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.NotifyEvent;
+import com.eboy.mv.model.Category;
+import com.eboy.mv.model.Recognition;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
@@ -95,15 +97,22 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(ImageRecognitionEvent event) {
-        String keywords = event.keywords;
+        Recognition recognition = event.recognition;
         Long userId = event.userId;
 
-        Assert.notNull(keywords);
+        Assert.notNull(recognition);
+        Assert.notEmpty(recognition.categories);
         Assert.notNull(userId);
 
         logger.info("Handle image recognition.");
 
-        this.sendText(keywords, String.valueOf(userId), event.platform);
+        // instantiate QueryObject
+
+        Category[] categories = recognition.categories;
+
+        Category category = categories[categories.length - 1];
+
+        this.sendText(category.name, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {
