@@ -3,6 +3,8 @@ package com.eboy.data;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
 
+import java.util.Date;
+
 /**
  * Created by alex on 20.11.16.
  */
@@ -16,7 +18,7 @@ public class ExtendedAd {
     double latitude;
     double longitude;
     String status;
-    String dateTime;
+    Date dateTime;
 
     String[] keyPhrases;
     public ExtendedAd(Ad ad, KeyPhraseModel keyPhraseModel) {
@@ -28,7 +30,7 @@ public class ExtendedAd {
         this.latitude = Double.parseDouble(ad.getAddress().getLatitude().getValueAsString());
         this.longitude = Double.parseDouble(ad.getAddress().getLongitude().getValueAsString());
         this.status = ad.getStatus().getValueAsString();
-//        this.dateTime = ad.getDateTime()
+         this.dateTime = ad.getDateTime();
         this.keyPhrases = keyPhraseModel.getKeyPhrases(this.id);
     }
 }
