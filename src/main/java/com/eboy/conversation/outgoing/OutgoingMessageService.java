@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -185,11 +186,18 @@ public class OutgoingMessageService {
     private String lastAdMessage(Ad ad) {
         Price price = ad.getPrice();
         Double amount = (Double) price.getAmount().getValue();
+
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        String moneyString = formatter.format(amount);
+
         StringBuilder sb = new StringBuilder();
         String NEW_LINE = "\n";
+
+
+
         sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
         sb.append(NEW_LINE);
-        sb.append("The price for the item is: " + amount + "\n");
+        sb.append("The price for the item is: " + moneyString + "€ \n");
         sb.append(NEW_LINE);
         sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
         sb.append(NEW_LINE);
@@ -203,6 +211,7 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(NoClueEvent event) {
-        sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);
+        /*sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);*/
+        sendText("http://s2.quickmeme.com/img/29/2964505b376c9cee5bd5d440d750fbd81448ed7907086a27334639ff0f009466.jpg",String.valueOf(event.getUserId()), event.platform);
     }
 }
