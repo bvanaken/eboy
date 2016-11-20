@@ -298,18 +298,21 @@ public class OutgoingMessageService {
     private String lastAdMessage(ExtendedAd ad) {
         Double amount = (Double) ad.getPrice();
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.GERMANY);
         String moneyString = formatter.format(amount);
 
         StringBuilder sb = new StringBuilder();
         String NEW_LINE = "\n";
 
-        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
+        sb.append("Hey! I have found a new product that you may be interested in. Lets just have a look together and let me know, if you need something else.");
         sb.append(NEW_LINE);
-        sb.append("The price for the item is: " + moneyString + "€ \n");
         sb.append(NEW_LINE);
-        //sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
-        sb.append("I think it is noteworthy because:" + this.getRandomKeyPhrase(ad));
+        sb.append("<b>" + ad.getTitle() + "</b>");
+        sb.append("<b>The price for the item is: </b>" + moneyString);
+        sb.append(NEW_LINE);
+        sb.append(NEW_LINE);
+        sb.append("<b>I think it is noteworthy because: </b>" + this.getRandomKeyPhrase(ad));
+        sb.append(NEW_LINE);
         sb.append(NEW_LINE);
         return sb.toString();
     }
@@ -326,7 +329,7 @@ public class OutgoingMessageService {
         String userId = String.valueOf(event.getUserId());
         Platform platform = event.getPlatform();
 
-        if(info != null){
+        if (info != null) {
 
             Integer subscribers = info.getNumberSubscribers();
 
@@ -373,10 +376,11 @@ public class OutgoingMessageService {
 
         String[] keyphrases = ad.getKeyPhrases();
         for (int i = 0; i < positives.length; i++) {
-            for (int j = 0; j <keyphrases.length; j++) {
-                if (positives[i].contains(keyphrases[i].toLowerCase())){
+            for (int j = 0; j < keyphrases.length; j++) {
+                if (positives[i].contains(keyphrases[i].toLowerCase())) {
                     return keyphrases[i];
-                };
+                }
+                ;
             }
         }
 
