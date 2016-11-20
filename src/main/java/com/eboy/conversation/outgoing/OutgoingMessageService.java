@@ -6,7 +6,6 @@ import com.eboy.data.EbayAdService;
 import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
-import com.eboy.data.dto.Price;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
 import com.eboy.event.*;
 import com.eboy.mv.model.Recognition;
@@ -90,10 +89,14 @@ public class OutgoingMessageService {
         }
     }
 
-    public void onQueryExtended(SearchQuery searchQuery, Long userId, Platform platform) {
+    public void onQueryExtended(SearchQuery searchQuery, String extraKeywords, Long userId, Platform platform) {
+
+        if (searchQuery.getMainKeyword() == null) {
+            this.sendText("I see. But what exactly do you wanna buy?", String.valueOf(userId), platform);
+        }
 
         if (searchQuery.getMaxPrice() == null) {
-            this.sendText("Cool. Any price limit from your side?", String.valueOf(userId), platform);
+            this.sendText(extraKeywords + ", cool. Any price limit from your side?", String.valueOf(userId), platform);
 
         } else if (searchQuery.getBerlin() == null) {
             this.sendText("Sounds good. Do you want to search in a specific city?", String.valueOf(userId), platform);
@@ -105,6 +108,7 @@ public class OutgoingMessageService {
             List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword(), searchQuery.getExtraKeyword()));
 
             eventBus.post(new NotifyEvent(userId, ads.get(0), platform));
+
         }
     }
 
@@ -118,6 +122,9 @@ public class OutgoingMessageService {
         List<LuisEntity> entities = response.getEntities();
 
         SearchQuery query = queryPersister.getSearchQuery(userId);
+        if (query == null) {
+            query = new SearchQuery(null, null, null, null);
+        }
 
         switch (intent) {
             case getItem:
@@ -127,7 +134,7 @@ public class OutgoingMessageService {
                 String keyword = itemType.isPresent() ? itemType.get().getEntity() : null;
 
                 if (keyword != null) {
-                    onKeywordDetected(keyword, userId, event.getPlatform());
+                    this.onKeywordDetected(keyword, userId, event.getPlatform());
                 }
                 break;
 
@@ -139,7 +146,7 @@ public class OutgoingMessageService {
                 query.setMainKeyword(query.getMainKeyword() + " " + keywords);
                 queryPersister.persistSearchQuery(userId, query);
 
-                onQueryExtended(query, userId, event.getPlatform());
+                this.onQueryExtended(query, keywords, userId, event.getPlatform());
 
                 break;
             case getLocation:
@@ -151,23 +158,26 @@ public class OutgoingMessageService {
 
                     query.setBerlin(true);
                     queryPersister.persistSearchQuery(userId, query);
-
-                    onQueryExtended(query, userId, event.getPlatform());
                 }
+
+                onQueryExtended(query, locEntity, userId, event.getPlatform());
+
                 break;
             case getPriceRange:
                 Optional<LuisEntity> priceMax = entities.stream().filter(v -> v.getType().equals("priceRangeType::EndingAt")).findFirst();
 
+                String price = priceMax.isPresent() ? priceMax.get().getType() : null;
+
                 query.setMaxPrice(400f);
                 queryPersister.persistSearchQuery(userId, query);
 
-                onQueryExtended(query, userId, event.getPlatform());
+                onQueryExtended(query, "", userId, event.getPlatform());
                 break;
         }
     }
 
     @Subscribe
-    public void handleEvent(NotifyEvent event) throws IOException{
+    public void handleEvent(NotifyEvent event) throws IOException {
         Ad data = event.data;
 
         ObjectMapper mapper = new ObjectMapper();
@@ -257,7 +267,7 @@ public class OutgoingMessageService {
     }
 
     private String getRandomKeyPhrase(ExtendedAd ad) {
-        int index = (int) Math.round(Math.random()*ad.getKeyPhrases().length);
+        int index = (int) Math.round(Math.random() * ad.getKeyPhrases().length);
         return ad.getKeyPhrases()[index];
     }
 }

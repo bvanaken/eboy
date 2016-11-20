@@ -3,7 +3,7 @@ package com.eboy.nlp;
 public enum Intent {
     None,
 
-    CONFIRM, REFUSE,
+    yes, no,
 
     getItem,
     getFilter,
