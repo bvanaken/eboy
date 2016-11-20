@@ -4,14 +4,8 @@ public enum Intent {
     None,
 
     CONFIRM, REFUSE,
-    START,
 
-    PROJECT_INFO,
-    UPDATES,
-    ANIMALS,
-    MARKET,
-
-    FAQ_RANDOM,
-    FAQ_FARM,
-    FAQ_FOOD
+    getItem,
+    getFilter,
+    getLocation
 }
