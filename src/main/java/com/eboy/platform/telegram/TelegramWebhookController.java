@@ -45,7 +45,7 @@ public class TelegramWebhookController {
         Intent intent = luisProcessor.getIntentFromText(update.getMessage().getText());
 
         List<String> keywords = new ArrayList<String>();
-        keywords.add("macbook");
+        keywords.add(text);
 
         List<Ad> adsForKeywords = ebayAdService.getAdsForKeywords(keywords);
 
@@ -56,5 +56,6 @@ public class TelegramWebhookController {
         }
 
         LatestAdEvent event = new LatestAdEvent(chatId, latestAd, Platform.TELEGRAM);
+        eventBus.post(event);
     }
 }

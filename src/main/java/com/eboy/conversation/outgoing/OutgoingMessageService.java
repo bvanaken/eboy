@@ -126,10 +126,15 @@ public class OutgoingMessageService {
 
     private String lastAdMessage(Ad ad) {
         Price price = ad.getPrice();
-        Integer amount = (Integer) price.getAmount().getValue();
+        Double amount = (Double) price.getAmount().getValue();
         StringBuilder sb = new StringBuilder();
-        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look?");
-        sb.append("The price for the item is: " + amount);
+        String NEW_LINE = "\n";
+        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
+        sb.append(NEW_LINE);
+        sb.append("The price for the item is: " + amount + "\n");
+        sb.append(NEW_LINE);
+        sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
+        sb.append(NEW_LINE);
         return sb.toString();
     }
 }
