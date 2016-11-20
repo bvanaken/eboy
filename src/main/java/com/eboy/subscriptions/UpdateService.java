@@ -31,7 +31,7 @@ public class UpdateService {
         this.eventBus = eventBus;
     }
 
-    @Scheduled(fixedDelay = 10 * 1000L)
+    @Scheduled(fixedDelay = 30 * 1000L)
     public void checkForUpdates() {
 
         Set<String> keys = persister.getKeys();

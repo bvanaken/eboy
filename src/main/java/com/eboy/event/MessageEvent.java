@@ -1,19 +1,18 @@
 package com.eboy.event;
 
-import com.eboy.nlp.Intent;
 import com.eboy.platform.Platform;
 
 /**
  * Created by root1 on 19/11/16.
  */
-public class IntentEvent {
+public class MessageEvent {
 
     public Long userId;
     public Platform platform;
-    public Intent intent;
+    public String text;
 
-    public IntentEvent(Long userId, Intent intent, Platform platform) {
-        this.intent = intent;
+    public MessageEvent(Long userId, String text, Platform platform) {
+        this.text = text;
         this.userId = userId;
         this.platform = platform;
     }
@@ -26,7 +25,7 @@ public class IntentEvent {
         return platform;
     }
 
-    public Intent getIntent() {
-        return intent;
+    public String getText() {
+        return text;
     }
 }
