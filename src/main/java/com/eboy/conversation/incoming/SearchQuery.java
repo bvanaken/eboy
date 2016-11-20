@@ -9,18 +9,18 @@ public class SearchQuery {
 
     private Float maxPrice;
     private Boolean isBerlin;
-    private String main_keyword;
-    private String extra_keyword;
+    private String mainKeyword;
+    private String extraKeyword;
 
     public SearchQuery() {
         //
     }
 
-    public SearchQuery(Float maxPrice, Boolean isBerlin, String main_keyword, String extra_keyword) {
+    public SearchQuery(Float maxPrice, Boolean isBerlin, String mainKeyword, String extraKeyword) {
         this.maxPrice = maxPrice;
         this.isBerlin = isBerlin;
-        this.main_keyword = main_keyword;
-        this.extra_keyword = extra_keyword;
+        this.mainKeyword = mainKeyword;
+        this.extraKeyword = extraKeyword;
     }
 
     public Float getMaxPrice() {
@@ -39,19 +39,19 @@ public class SearchQuery {
         isBerlin = berlin;
     }
 
-    public String getMain_keyword() {
-        return main_keyword;
+    public String getMainKeyword() {
+        return mainKeyword;
     }
 
-    public void setMain_keyword(String main_keyword) {
-        this.main_keyword = main_keyword;
+    public void setMainKeyword(String mainKeyword) {
+        this.mainKeyword = mainKeyword;
     }
 
-    public String getExtra_keyword() {
-        return extra_keyword;
+    public String getExtraKeyword() {
+        return extraKeyword;
     }
 
-    public void setExtra_keyword(String extra_keyword) {
-        this.extra_keyword = extra_keyword;
+    public void setExtraKeyword(String extraKeyword) {
+        this.extraKeyword = extraKeyword;
     }
 }
