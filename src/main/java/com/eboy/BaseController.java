@@ -5,11 +5,11 @@ import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.eboy.mv.ComputerVision;
 import com.eboy.platform.Platform;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.eboy.subscriptions.model.Subscription;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,9 +56,13 @@ public class BaseController {
     @RequestMapping("/subscribe")
     public void subscribe() {
 
-        String key = "Deutsche Bahn";
+        String key = "Computer neu";
+        String key1 = "Puzzle";
+        String key2 = "Diddl Maus";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key, 12.4f));
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key, 12.4f, false));
+        persister.persistSubscription(key1, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key1, 12.4f, true));
+        persister.persistSubscription(key2, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key2, 12.4f, true));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }

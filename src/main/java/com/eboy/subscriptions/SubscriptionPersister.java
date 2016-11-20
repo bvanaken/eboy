@@ -6,8 +6,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -20,13 +18,11 @@ import java.util.Set;
 public class SubscriptionPersister {
 
     private RedisTemplate<String, Object> redisTemplate;
-    private RedisSerializer<Object> serializer;
     ObjectMapper mapper;
 
     @Autowired
     public SubscriptionPersister(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        this.serializer = new JdkSerializationRedisSerializer();
         this.mapper = new ObjectMapper();
     }
 

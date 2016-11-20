@@ -13,17 +13,19 @@ public class Subscription implements Serializable {
     Long lastAd;
     String keywords;
     Float price;
+    Boolean isBerlin;
 
     public Subscription() {
     }
 
-    public Subscription(Long userId, Platform platform, Date lastAdDate, Long lastAd, String keywords, Float price) {
+    public Subscription(Long userId, Platform platform, Date lastAdDate, Long lastAd, String keywords, Float price, Boolean isBerlin) {
         this.userId = userId;
         this.platform = platform;
         this.lastAdDate = lastAdDate;
         this.keywords = keywords;
         this.price = price;
         this.lastAd = lastAd;
+        this.isBerlin = isBerlin;
     }
 
     public Long getUserId() {
@@ -58,6 +60,10 @@ public class Subscription implements Serializable {
         this.lastAdDate = lastAdDate;
     }
 
+    public Boolean getIsBerlin() {
+        return isBerlin;
+    }
+
     @Override
     public String toString() {
         return "Subscription{" +
@@ -67,6 +73,7 @@ public class Subscription implements Serializable {
                 ", lastAd=" + lastAd +
                 ", keywords='" + keywords + '\'' +
                 ", price=" + price +
+                ", isBerlin=" + isBerlin +
                 '}';
     }
 }
