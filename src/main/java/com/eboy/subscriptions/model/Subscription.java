@@ -25,6 +25,7 @@ public class Subscription implements Serializable {
         this.keywords = keywords;
         this.price = price;
         this.lastAd = lastAd;
+        this.isBerlin = isBerlin;
     }
 
     public Long getUserId() {
@@ -59,7 +60,7 @@ public class Subscription implements Serializable {
         this.lastAdDate = lastAdDate;
     }
 
-    public Boolean isBerlin() {
+    public Boolean getIsBerlin() {
         return isBerlin;
     }
 
@@ -72,6 +73,7 @@ public class Subscription implements Serializable {
                 ", lastAd=" + lastAd +
                 ", keywords='" + keywords + '\'' +
                 ", price=" + price +
+                ", isBerlin=" + isBerlin +
                 '}';
     }
 }

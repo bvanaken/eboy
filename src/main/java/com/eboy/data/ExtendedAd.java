@@ -28,7 +28,7 @@ public class ExtendedAd {
         this.latitude = Double.parseDouble(ad.getAddress().getLatitude().getValueAsString());
         this.longitude = Double.parseDouble(ad.getAddress().getLongitude().getValueAsString());
         this.status = ad.getStatus().getValueAsString();
-        this.dateTime = ad.getDateTime().getValueAsString();
+//        this.dateTime = ad.getDateTime()
         this.keyPhrases = keyPhraseModel.getKeyPhrases(this.id);
     }
 }

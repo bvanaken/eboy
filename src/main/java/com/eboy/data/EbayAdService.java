@@ -34,6 +34,10 @@ public class EbayAdService {
         this.restTemplate = restTemplate;
     }
 
+    public List<Ad> getAdsForKeywords(List<String> keywords) {
+        return this.getAdsForKeywords(keywords, null, null);
+    }
+
     public List<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
 
         String url = BASE_STRING;
@@ -46,7 +50,7 @@ public class EbayAdService {
         url = url.substring(0, url.length() - 1);
         url += FIELDS;
 
-        if (isBerlin) {
+        if (isBerlin != null && isBerlin) {
             url += IS_BERLIN;
         }
 

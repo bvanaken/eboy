@@ -42,26 +42,30 @@ public class UpdateService {
 
             List<Subscription> subscriptions = persister.getSubscriptions(keyword);
 
-            if (subscriptions == null || subscriptions.isEmpty()) {
-                return;
+            if (subscriptions == null) {
+                break;
             }
 
             // Filter berlin ones
-            List<Subscription> berlinSubscriptions = subscriptions.stream().filter(Subscription::isBerlin).collect(Collectors.toList());
+            List<Subscription> berlinSubscriptions = subscriptions.stream().filter(Subscription::getIsBerlin).collect(Collectors.toList());
             subscriptions.removeAll(berlinSubscriptions);
 
-            // NON BERLIN SUBSCRIBERS
-            Ad newestAd = adService.getLatestAd(Arrays.asList(keyword));
-            Long newestAdId = newestAd.getId();
-            logger.info("newestAd: " + newestAd);
+            if (!subscriptions.isEmpty()) {
+                // NON BERLIN SUBSCRIBERS
+                Ad newestAd = adService.getLatestAd(Arrays.asList(keyword));
+                Long newestAdId = newestAd.getId();
+                logger.info("newestAd: " + newestAd);
 
-            // Assume all subscribers have the same last article
-            // Check if article is not last article
-            if (!newestAdId.equals(subscriptions.get(0).getLastAd())) {
+                // Assume all subscribers have the same last article
+                // Check if article is not last article
+                if (!newestAdId.equals(subscriptions.get(0).getLastAd())) {
 
+                    this.notifySubscribers(subscriptions, newestAd);
+                }
+            }
 
-                this.notifySubscribers(subscriptions, newestAd);
-
+            if (berlinSubscriptions.isEmpty()) {
+                break;
             }
 
             // BERLIN SUBSCRIBERS
@@ -85,13 +89,16 @@ public class UpdateService {
         for (Subscription subscription : subscriptions) {
 
             // CHECK PRICE
-            if (subscription.getPrice() >= (Float) ad.getPrice().getAmount().getValue()) {
+            if (subscription.getPrice() >= (Double) ad.getPrice().getAmount().getValue()) {
 
                 eventBus.post(new NotifyEvent(subscription.getUserId(), ad, subscription.getPlatform()));
 
                 subscription.setLastAd(ad.getId());
                 persister.persistSubscription(subscription.getKeywords(), subscription);
 
+            } else {
+                System.out.println("Sub Price: " + subscription.getPrice());
+                System.out.println("Ad Price: " + (Double) ad.getPrice().getAmount().getValue());
             }
         }
 
