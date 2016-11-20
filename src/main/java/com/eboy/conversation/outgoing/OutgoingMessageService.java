@@ -15,6 +15,7 @@ import com.eboy.platform.MessageService;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
+import com.eboy.subscriptions.QueryPersister;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -35,6 +36,9 @@ public class OutgoingMessageService {
     private MessageService telegramMessageService;
     private OutgoingMessageHelper messageHelper;
     private SubscriptionPersister persister;
+
+    @Autowired
+    private QueryPersister queryPersister;
     @Autowired
     private EbayAdService adService;
     @Autowired
@@ -64,17 +68,37 @@ public class OutgoingMessageService {
 
         List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(keyword));
 
-        new SearchQuery(null, null, keyword, null);
+        SearchQuery searchQuery = new SearchQuery(null, null, keyword, null);
 
-        if (ads == null || ads.size() < 2){
-
-
+        if (ads == null || ads.isEmpty()) {
+            eventBus.post(new AskUpdateEvent(userId, searchQuery, platform));
         }
 
         if (ads != null && ads.size() > 1) {
-            eventBus.post(new SpecifyEvent());
-            this.sendText("I found " + ads.size() + " Articles for you! Do you want to specify a bit more?", String.valueOf(userId), platform);
+            this.sendText("I found " + adService.getNumberOfAdsForKeywords(Arrays.asList(keyword)) + " articles for you! Do you want to specify a bit more?", String.valueOf(userId), platform);
+            queryPersister.persistSearchQuery(userId, searchQuery);
 
+        } else {
+
+            eventBus.post(new NotifyEvent(userId, ads.get(0), platform));
+        }
+    }
+
+    public void onQueryExtended(SearchQuery searchQuery, Long userId, Platform platform) {
+
+        if (searchQuery.getMaxPrice() == null) {
+            this.sendText("Cool. Any price limit from your side?", String.valueOf(userId), platform);
+
+        } else if (searchQuery.getBerlin() == null) {
+            this.sendText("Sounds good. Do you want to search in a specific city?", String.valueOf(userId), platform);
+
+        } else {
+
+            this.sendText("I got it! Let's see what is out there...", String.valueOf(userId), platform);
+
+            List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword(), searchQuery.getExtraKeyword()));
+
+            eventBus.post(new NotifyEvent(userId, ads.get(0), platform));
         }
     }
 
@@ -86,6 +110,8 @@ public class OutgoingMessageService {
 
         Intent intent = response.getTopIntent().getIntent();
         List<LuisEntity> entities = response.getEntities();
+
+        SearchQuery query = queryPersister.getSearchQuery(userId);
 
         switch (intent) {
             case getItem:
@@ -100,28 +126,38 @@ public class OutgoingMessageService {
                 break;
 
             case getFilter:
-                ArrayList<String> keywords = new ArrayList<>();
+                String keywords = "";
                 for (LuisEntity entity : entities) {
-                    keywords.add(entity.getEntity());
+                    keywords += entity.getEntity() + " ";
                 }
+                query.setMainKeyword(query.getMainKeyword() + " " + keywords);
+                queryPersister.persistSearchQuery(userId, query);
 
-                SearchQuery q = new SearchQuery();
+                onQueryExtended(query, userId, event.getPlatform());
 
                 break;
             case getLocation:
                 Optional<LuisEntity> locationType = entities.stream().filter(v -> v.getType().equals("locationType")).findFirst();
-                String locType = locationType.get().getType();
-                if (locType.equals("locationType::districtOfBerlin")) {
+                String locEntity = locationType.isPresent() ? locationType.get().getEntity().toLowerCase() : null;
+                String locType = locationType.isPresent() ? locationType.get().getType() : null;
 
+                if (("locationType::districtOfBerlin").equals(locEntity) || ("berlin").equals(locType)) {
+
+                    query.setBerlin(true);
+                    queryPersister.persistSearchQuery(userId, query);
+
+                    onQueryExtended(query, userId, event.getPlatform());
                 }
                 break;
+            case getPriceRange:
+                Optional<LuisEntity> priceMax = entities.stream().filter(v -> v.getType().equals("priceRangeType::EndingAt")).findFirst();
+
+                query.setMaxPrice(400f);
+                queryPersister.persistSearchQuery(userId, query);
+
+                onQueryExtended(query, userId, event.getPlatform());
+                break;
         }
-    }
-
-    @Subscribe
-    public void handleEvent(SpecifyEvent event) {
-
-
     }
 
     @Subscribe
@@ -198,11 +234,11 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(StartEvent event) {
-        sendText("Hey, may I help you? Do you want to buy or do you want to sell something?",String.valueOf(event.getUserId()), event.platform);
+        sendText("Hey, may I help you? Do you want to buy or do you want to sell something?", String.valueOf(event.getUserId()), event.platform);
     }
 
     @Subscribe
     public void handleEvent(NoClueEvent event) {
-        sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);
+        sendText("I have no clue what you want from me.", String.valueOf(event.getUserId()), event.platform);
     }
 }

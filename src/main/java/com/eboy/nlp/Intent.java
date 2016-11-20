@@ -7,5 +7,6 @@ public enum Intent {
 
     getItem,
     getFilter,
-    getLocation
+    getLocation,
+    getPriceRange
 }
