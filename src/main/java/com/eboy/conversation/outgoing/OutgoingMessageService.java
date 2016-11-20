@@ -401,7 +401,7 @@ public class OutgoingMessageService {
             }
         }
 
-        int index = (int) Math.round(Math.random() * keyphrases.length);
+        int index = (int) Math.round(Math.random() * keyphrases.length-1);
         return ad.getKeyPhrases()[index];
     }
 }

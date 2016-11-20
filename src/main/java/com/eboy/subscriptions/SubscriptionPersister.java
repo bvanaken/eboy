@@ -34,7 +34,7 @@ public class SubscriptionPersister {
         if (object != null) {
 
             try {
-                ArrayList<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
+                ArrayList<Subscription> list = mapper.readValue(object, new TypeReference<ArrayList<Subscription>>() {
                 });
 
                 return list;
@@ -64,7 +64,7 @@ public class SubscriptionPersister {
 
     public void persistSubscription(final String key, Subscription subscription) {
 
-        List<Subscription> list = this.getSubscriptions(key);
+        ArrayList<Subscription> list = this.getSubscriptions(key);
 
         if (list == null) {
             list = new ArrayList<>();

@@ -18,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -77,13 +79,14 @@ public class BaseController {
     @RequestMapping("/subscribe")
     public void subscribe() {
 
-        String key = "Computer neu";
-        String key1 = "Puzzle";
-        String key2 = "Diddl Maus";
+        String key = "used bike";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key, 12.4f, false));
-        persister.persistSubscription(key1, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key1, 12.4f, true));
-        persister.persistSubscription(key2, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key2, 12.4f, true));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, false));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, true));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, true));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, true));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, true));
+        persister.persistSubscription(key, new Subscription(123L, Platform.TELEGRAM, new Date(1507500000000L), 1234L, key, 12.4f, true));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }
@@ -149,9 +152,11 @@ public class BaseController {
 
 
     @RequestMapping("/trigger-update")
-    public String getTriggerUpdate() throws IOException {
+    public String getTriggerUpdate(@PathParam("id") Long id) throws IOException {
 
-        /*eventBus.post(new NotifyEvent("",""));*/
+        ArrayList<Ad> adsForKeywords = adService.getAdsForKeywords(Arrays.asList("macbook 17 zoll"));
+
+        eventBus.post(new NotifyEvent(id, Platform.TELEGRAM, adsForKeywords.get(0), null));
 
         return "Sucess!";
     }
