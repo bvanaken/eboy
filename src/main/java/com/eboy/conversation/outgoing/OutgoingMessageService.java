@@ -1,20 +1,14 @@
 package com.eboy.conversation.outgoing;
 
-import com.eboy.conversation.outgoing.dto.Button;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
-import com.eboy.conversation.outgoing.dto.MessagePayload;
 import com.eboy.data.dto.Ad;
-import com.eboy.data.dto.Field;
 import com.eboy.data.dto.Price;
 import com.eboy.event.IntentEvent;
-import com.eboy.event.LatestAdEvent;
-import com.eboy.nlp.Intent;
+import com.eboy.event.NotifyEvent;
 import com.eboy.platform.MessageService;
-import com.eboy.platform.MessageType;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
-import com.eboy.platform.telegram.TelegramWebhookController;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,8 +17,6 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.logging.Logger;
-
-import static org.aspectj.bridge.Version.text;
 
 @Service
 public class OutgoingMessageService {
@@ -87,7 +79,7 @@ public class OutgoingMessageService {
     }
 
     @Subscribe
-    public void handleEvent(LatestAdEvent event) {
+    public void handleEvent(NotifyEvent event) {
         Ad data = event.data;
         Long userId = event.userId;
 

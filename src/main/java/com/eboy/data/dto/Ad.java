@@ -2,6 +2,9 @@ package com.eboy.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class Ad {
@@ -64,8 +67,23 @@ public class Ad {
         return status;
     }
 
-    public Field getDateTime() {
-        return dateTime;
+    public Date getDateTime() {
+
+        String dateString = (String) dateTime.getValue();
+
+        if (dateString.length() == 28) {
+            dateString = dateString.substring(0, dateString.length() - 9);
+        }
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        try {
+            return dateFormatter.parse(dateString);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Link> getLinks() {

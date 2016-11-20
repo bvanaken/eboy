@@ -52,9 +52,9 @@ public class BaseController {
     @RequestMapping("/subscribe")
     public void subscribe() {
 
-        String key = "hey";
+        String key = "Deutsche Bahn";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(), key, 12.4f));
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key, 12.4f));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }

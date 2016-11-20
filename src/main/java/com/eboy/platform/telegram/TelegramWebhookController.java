@@ -1,17 +1,13 @@
 package com.eboy.platform.telegram;
 
-import com.eboy.conversation.incoming.EventProcessor;
 import com.eboy.data.EbayAdService;
 import com.eboy.data.dto.Ad;
-import com.eboy.event.IntentEvent;
-import com.eboy.event.LatestAdEvent;
+import com.eboy.event.NotifyEvent;
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.LuisProcessor;
 import com.eboy.platform.Platform;
-import com.eboy.platform.facebook.update.Event;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -55,7 +51,7 @@ public class TelegramWebhookController {
             return;
         }
 
-        LatestAdEvent event = new LatestAdEvent(chatId, latestAd, Platform.TELEGRAM);
+        NotifyEvent event = new NotifyEvent(chatId, latestAd, Platform.TELEGRAM);
         eventBus.post(event);
     }
 }
