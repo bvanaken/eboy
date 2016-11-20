@@ -53,6 +53,17 @@ public class BaseController {
         return adService.getAdsForKeywords(keywords);
     }
 
+    @RequestMapping("/ads-number")
+    public int getAdsNumber() {
+
+        ArrayList<String> keywords = new ArrayList<>();
+        keywords.add("macbook");
+        keywords.add("pro");
+        keywords.add("2014");
+
+        return adService.getNumberOfAdsForKeywords(keywords);
+    }
+
     @RequestMapping("/subscribe")
     public void subscribe() {
 
