@@ -18,7 +18,9 @@ import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
 import com.eboy.subscriptions.QueryPersister;
+import com.eboy.subscriptions.SubscriberService;
 import com.eboy.subscriptions.SubscriptionPersister;
+import com.eboy.subscriptions.model.SellerInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -30,6 +32,8 @@ import org.springframework.util.Assert;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class OutgoingMessageService {
@@ -43,6 +47,8 @@ public class OutgoingMessageService {
 
     @Autowired
     private QueryPersister queryPersister;
+    @Autowired
+    private SubscriberService subscriberService;
     @Autowired
     private EbayAdService adService;
     MsTextAnalyticService textAnalyser;
@@ -85,7 +91,7 @@ public class OutgoingMessageService {
 
         } else {
 
-            eventBus.post(new NotifyEvent(userId, ads.get(0), platform));
+            eventBus.post(new NotifyEvent(userId, platform, ads.get(0), searchQuery));
         }
     }
 
@@ -107,7 +113,7 @@ public class OutgoingMessageService {
 
             List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword(), searchQuery.getExtraKeyword()));
 
-            eventBus.post(new NotifyEvent(userId, ads.get(0), platform));
+            eventBus.post(new NotifyEvent(userId, platform, ads.get(0), searchQuery));
 
         }
     }
@@ -127,6 +133,11 @@ public class OutgoingMessageService {
         }
 
         switch (intent) {
+//            case yes:
+//            case no:
+//            case triggerSubscribe:
+//
+
             case getItem:
 
                 Optional<LuisEntity> itemType = entities.stream().filter(v -> v.getType().equals("itemType")).findFirst();
@@ -157,8 +168,10 @@ public class OutgoingMessageService {
                 if (("locationType::districtOfBerlin").equals(locEntity) || ("berlin").equals(locType)) {
 
                     query.setBerlin(true);
-                    queryPersister.persistSearchQuery(userId, query);
+                } else {
+                    query.setBerlin(false);
                 }
+                queryPersister.persistSearchQuery(userId, query);
 
                 onQueryExtended(query, locEntity, userId, event.getPlatform());
 
@@ -166,7 +179,7 @@ public class OutgoingMessageService {
             case getPriceRange:
                 Optional<LuisEntity> priceMax = entities.stream().filter(v -> v.getType().equals("priceRangeType::EndingAt")).findFirst();
 
-                String price = priceMax.isPresent() ? priceMax.get().getType() : null;
+                String price = priceMax.isPresent() ? priceMax.get().getEntity() : null;
 
                 query.setMaxPrice(400f);
                 queryPersister.persistSearchQuery(userId, query);
@@ -259,6 +272,41 @@ public class OutgoingMessageService {
     @Subscribe
     public void handleEvent(StartEvent event) {
         sendText("Hey, may I help you? Do you want to buy or do you want to sell something?", String.valueOf(event.getUserId()), event.platform);
+    }
+
+
+    @Subscribe
+    public void handleEvent(SellEvent event) {
+        SellerInfo info = subscriberService.getInfoForKeyword(event.getKeywords());
+
+        String userId = String.valueOf(event.getUserId());
+        Platform platform = event.getPlatform();
+
+        Integer subscribers = info.getNumberSubscribers();
+
+        Float priceMin = info.getPriceMin();
+        Float priceMax = info.getPriceMax();
+
+        if (subscribers < 0) {
+            sendText("Bummer, there's no one directly subscribed to your article at the moment. Maybe you should wait a bit or just try your luck on the market!", userId, platform);
+
+        } else if (subscribers < 5) {
+            sendText("There are currently " + subscribers + " looking for your article. The price range is between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+
+        } else {
+            sendText("I think that's a great idea! There are currently " + subscribers + " looking for your article. Just the right time to sell! The price range lies between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+        }
+    }
+
+    public String findNumber(String text) {
+        Pattern p = Pattern.compile("/([0-9])/g");
+
+        Matcher m = p.matcher(text);
+
+        if (m.find()) {
+            return m.group();
+        }
+        return null;
     }
 
     @Subscribe

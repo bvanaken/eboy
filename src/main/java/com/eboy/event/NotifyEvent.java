@@ -1,5 +1,6 @@
 package com.eboy.event;
 
+import com.eboy.conversation.incoming.SearchQuery;
 import com.eboy.data.dto.Ad;
 import com.eboy.platform.Platform;
 
@@ -11,11 +12,13 @@ public class NotifyEvent {
     public Long userId;
     public Platform platform;
     public Ad data;
+    public SearchQuery searchQuery;
 
-    public NotifyEvent(Long userId, Ad data, Platform platform) {
+    public NotifyEvent(Long userId, Platform platform, Ad data, SearchQuery searchQuery) {
         this.userId = userId;
-        this.data = data;
         this.platform = platform;
+        this.data = data;
+        this.searchQuery = searchQuery;
     }
 
     public Long getUserId() {
@@ -24,6 +27,10 @@ public class NotifyEvent {
 
     public Platform getPlatform() {
         return platform;
+    }
+
+    public SearchQuery getSearchQuery() {
+        return searchQuery;
     }
 
     public Ad getData() {
