@@ -4,117 +4,138 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
 
-	@JsonProperty("message_id")
-	private Integer messageId;
-	private String text;
-	private Chat chat;
-	private Sender from;
+    @JsonProperty("message_id")
+    private Integer messageId;
+    private String text;
+    private Chat chat;
+    private Sender from;
 
-	private MessageEntity[] entities;
+    private MessageEntity[] entities;
 
-	private Integer date;
+    private Integer date;
 
-	@JsonProperty("forward_from")
-	private Sender forwardFrom;
+    @JsonProperty("forward_from")
+    private Sender forwardFrom;
 
-	@JsonProperty("forward_from_chat")
-	private Chat forwardFromChat;
+    @JsonProperty("forward_from_chat")
+    private Chat forwardFromChat;
 
-	@JsonProperty("forward_date")
-	private Integer forwardDate;
+    @JsonProperty("forward_date")
+    private Integer forwardDate;
 
-	public Message() {
-		// jersey
-	}
+    private TelegramFile[] photo;
 
-	public String getText() {
-		return text;
-	}
+    private Location location;
 
-	public void setText(String text) {
-		this.text = text;
-	}
+    public Message() {
+        // jersey
+    }
 
-	public Chat getChat() {
-		return chat;
-	}
+    public String getText() {
+        return text;
+    }
 
-	public void setChat(Chat chat) {
-		this.chat = chat;
-	}
+    public void setText(String text) {
+        this.text = text;
+    }
 
-	public Integer getMessageId() {
-		return messageId;
-	}
+    public Chat getChat() {
+        return chat;
+    }
 
-	public void setMessageId(Integer messageId) {
-		this.messageId = messageId;
-	}
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
 
-	public Sender getFrom() {
-		return from;
-	}
+    public Integer getMessageId() {
+        return messageId;
+    }
 
-	public void setFrom(Sender from) {
-		this.from = from;
-	}
+    public void setMessageId(Integer messageId) {
+        this.messageId = messageId;
+    }
 
-	public MessageEntity[] getEntities() {
-		return entities;
-	}
+    public Sender getFrom() {
+        return from;
+    }
 
-	public void setEntities(MessageEntity[] entities) {
-		this.entities = entities;
-	}
+    public void setFrom(Sender from) {
+        this.from = from;
+    }
 
-	public Integer getDate() {
-		return date;
-	}
+    public MessageEntity[] getEntities() {
+        return entities;
+    }
 
-	public void setDate(Integer date) {
-		this.date = date;
-	}
+    public void setEntities(MessageEntity[] entities) {
+        this.entities = entities;
+    }
 
-	public Sender getForwardFrom() {
-		return forwardFrom;
-	}
+    public Integer getDate() {
+        return date;
+    }
 
-	public void setForwardFrom(Sender forwardFrom) {
-		this.forwardFrom = forwardFrom;
-	}
+    public void setDate(Integer date) {
+        this.date = date;
+    }
 
-	public Chat getForwardFromChat() {
-		return forwardFromChat;
-	}
+    public Sender getForwardFrom() {
+        return forwardFrom;
+    }
 
-	public void setForwardFromChat(Chat forwardFromChat) {
-		this.forwardFromChat = forwardFromChat;
-	}
+    public void setForwardFrom(Sender forwardFrom) {
+        this.forwardFrom = forwardFrom;
+    }
 
-	public Integer getForwardDate() {
-		return forwardDate;
-	}
+    public Chat getForwardFromChat() {
+        return forwardFromChat;
+    }
 
-	public void setForwardDate(Integer forwardDate) {
-		this.forwardDate = forwardDate;
-	}
+    public void setForwardFromChat(Chat forwardFromChat) {
+        this.forwardFromChat = forwardFromChat;
+    }
 
-	@Override
-	public String toString() {
-		return "Message{" +
-				"messageId=" + messageId +
-				", text='" + text + '\'' +
-				", chat=" + chat +
-				", from=" + from +
-				", entities=" + Arrays.toString(entities) +
-				", date=" + date +
-				", forwardFrom=" + forwardFrom +
-				", forwardFromChat=" + forwardFromChat +
-				", forwardDate=" + forwardDate +
-				'}';
-	}
+    public Integer getForwardDate() {
+        return forwardDate;
+    }
+
+    public void setForwardDate(Integer forwardDate) {
+        this.forwardDate = forwardDate;
+    }
+
+    public TelegramFile[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(TelegramFile[] photo) {
+        this.photo = photo;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "messageId=" + messageId +
+                ", text='" + text + '\'' +
+                ", chat=" + chat +
+                ", from=" + from +
+                ", entities=" + Arrays.toString(entities) +
+                ", date=" + date +
+                ", forwardFrom=" + forwardFrom +
+                ", forwardFromChat=" + forwardFromChat +
+                ", forwardDate=" + forwardDate +
+                '}';
+    }
 }

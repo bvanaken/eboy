@@ -42,7 +42,10 @@ public class MsTextAnalyticService {
     public String analyzeAds(List<Ad> ads) {
         String  documents = " {\"documents\": [";
         for (int i = 0; i < ads.size(); i++) {
-            String description = ads.get(i).getDescription().getValueAsString();
+            String description = ads.get(i).getDescription().getValueAsString()
+                    .replaceAll("\\<.*?>"," ")
+                    .replaceAll("</br>", " ")
+                    .replaceAll("&quot;", " ");
             documents = documents + new AnalyticsDocument(ads.get(i).getId(), description).toJSON() +", ";
         }
         return this.analyze(documents + "]}");
