@@ -38,46 +38,52 @@ public class UpdateService {
 
         for (String keyword : keys) {
 
-            logger.info("keys: " + keys.toString());
+            try {
+                Long.valueOf(keyword);
+            } catch (Exception e) {
 
-            List<Subscription> subscriptions = persister.getSubscriptions(keyword);
+                logger.info("keys: " + keys.toString());
 
-            if (subscriptions == null) {
-                break;
-            }
+                List<Subscription> subscriptions = persister.getSubscriptions(keyword);
 
-            // Filter berlin ones
-            List<Subscription> berlinSubscriptions = subscriptions.stream().filter(Subscription::getIsBerlin).collect(Collectors.toList());
-            subscriptions.removeAll(berlinSubscriptions);
+                if (subscriptions == null) {
+                    break;
+                }
 
-            if (!subscriptions.isEmpty()) {
-                // NON BERLIN SUBSCRIBERS
-                Ad newestAd = adService.getLatestAd(Arrays.asList(keyword));
-                Long newestAdId = newestAd.getId();
-                logger.info("newestAd: " + newestAd);
+                // Filter berlin ones
+                List<Subscription> berlinSubscriptions = subscriptions.stream().filter(Subscription::getIsBerlin).collect(Collectors.toList());
+                subscriptions.removeAll(berlinSubscriptions);
+
+                if (!subscriptions.isEmpty()) {
+                    // NON BERLIN SUBSCRIBERS
+                    Ad newestAd = adService.getLatestAd(Arrays.asList(keyword));
+                    Long newestAdId = newestAd.getId();
+                    logger.info("newestAd: " + newestAd);
+
+                    // Assume all subscribers have the same last article
+                    // Check if article is not last article
+                    if (!newestAdId.equals(subscriptions.get(0).getLastAd())) {
+
+                        this.notifySubscribers(subscriptions, newestAd);
+                    }
+                }
+
+                if (berlinSubscriptions.isEmpty()) {
+                    break;
+                }
+
+                // BERLIN SUBSCRIBERS
+                Ad newestAdBerlin = adService.getLatestAdInBerlin(Arrays.asList(keyword));
+                Long newestAdBerlinId = newestAdBerlin.getId();
+                logger.info("newestAdBerlin: " + newestAdBerlin);
 
                 // Assume all subscribers have the same last article
                 // Check if article is not last article
-                if (!newestAdId.equals(subscriptions.get(0).getLastAd())) {
+                if (!newestAdBerlinId.equals(berlinSubscriptions.get(0).getLastAd())) {
 
-                    this.notifySubscribers(subscriptions, newestAd);
+                    this.notifySubscribers(berlinSubscriptions, newestAdBerlin);
+
                 }
-            }
-
-            if (berlinSubscriptions.isEmpty()) {
-                break;
-            }
-
-            // BERLIN SUBSCRIBERS
-            Ad newestAdBerlin = adService.getLatestAdInBerlin(Arrays.asList(keyword));
-            Long newestAdBerlinId = newestAdBerlin.getId();
-            logger.info("newestAdBerlin: " + newestAdBerlin);
-
-            // Assume all subscribers have the same last article
-            // Check if article is not last article
-            if (!newestAdBerlinId.equals(berlinSubscriptions.get(0).getLastAd())) {
-
-                this.notifySubscribers(berlinSubscriptions, newestAdBerlin);
 
             }
 

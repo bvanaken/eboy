@@ -1,5 +1,6 @@
 package com.eboy;
 
+import com.eboy.conversation.incoming.SearchQuery;
 import com.eboy.data.EbayAdService;
 import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
@@ -7,6 +8,7 @@ import com.eboy.data.dto.Ad;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
 import com.eboy.mv.ComputerVision;
 import com.eboy.platform.Platform;
+import com.eboy.subscriptions.QueryPersister;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.eboy.subscriptions.model.Subscription;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +28,9 @@ public class BaseController {
     EbayAdService adService;
     ComputerVision imageAnalyzer;
     SubscriptionPersister persister;
+
+    @Autowired
+    QueryPersister queryPersister;
 
     @Autowired
     public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer, SubscriptionPersister persister) {
@@ -82,6 +87,17 @@ public class BaseController {
 
         List<Ad> ads = this.getAds();
         return this.textAnalyser.analyzeAds(ads);
+    }
+
+    @RequestMapping("/persist")
+    public String persistQuery() {
+
+        queryPersister.persistSearchQuery(12345L, new SearchQuery(400f, false, "word", "extra"));
+
+        SearchQuery searchQuery = queryPersister.getSearchQuery(12345L);
+
+        return searchQuery.toString();
+
     }
 
     @RequestMapping("/find-mac-ssd-gold")

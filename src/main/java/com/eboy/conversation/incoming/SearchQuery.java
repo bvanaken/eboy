@@ -1,7 +1,5 @@
 package com.eboy.conversation.incoming;
 
-import com.eboy.data.dto.Price;
-
 /**
  * Created by root1 on 20/11/16.
  */
@@ -53,5 +51,15 @@ public class SearchQuery {
 
     public void setExtraKeyword(String extraKeyword) {
         this.extraKeyword = extraKeyword;
+    }
+
+    @Override
+    public String toString() {
+        return "SearchQuery{" +
+                "maxPrice=" + maxPrice +
+                ", isBerlin=" + isBerlin +
+                ", mainKeyword='" + mainKeyword + '\'' +
+                ", extraKeyword='" + extraKeyword + '\'' +
+                '}';
     }
 }
