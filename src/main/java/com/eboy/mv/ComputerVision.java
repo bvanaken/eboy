@@ -17,7 +17,7 @@ public class ComputerVision {
     /**
      * The main URL for calling the Computer Vision API of Microsoft.
      */
-    private static final String MAIN_URL = "https://api.projectoxford.ai/vision/v1.0/analyze?language=en";
+    private static final String MAIN_URL = "https://api.projectoxford.ai/vision/v1.0/tag";
 
     /**
      * The content type in the header of teh api call as final {@link String}
