@@ -58,11 +58,7 @@ public class OutgoingMessageService {
     public void handleEvent(IntentEvent event) {
 
         Long userId = event.getUserId();
-        Intent intent = event.getIntent();
 
-        switch (intent) {
-            case getFilter:
-        }
     }
 
     @Subscribe
