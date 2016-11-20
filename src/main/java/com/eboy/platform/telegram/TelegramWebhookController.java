@@ -1,33 +1,22 @@
 package com.eboy.platform.telegram;
 
-import com.eboy.conversation.incoming.EventProcessor;
 import com.eboy.data.EbayAdService;
-import com.eboy.data.dto.Ad;
-import com.eboy.event.IntentEvent;
-import com.eboy.event.LatestAdEvent;
 import com.eboy.mv.ComputerVision;
-import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.LuisProcessor;
-import com.eboy.platform.Platform;
-import com.eboy.platform.facebook.update.Event;
 import com.eboy.platform.telegram.model.Message;
-import com.eboy.platform.telegram.model.MessageEntity;
 import com.eboy.platform.telegram.model.TelegramFile;
 import com.eboy.platform.telegram.model.response.FileResponse;
 import com.google.common.eventbus.EventBus;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.TelegramBotAdapter;
-import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.response.GetFileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -98,9 +87,6 @@ public class TelegramWebhookController {
         String keyword = imageAnalyzer.analyzeImage(fileUrl);
 
         logger.info(keyword);
-
-        /*GetFileResponse file = bot.getFile(telegramFile.fileId);*/
-        /*file.file().filePath();*/
     }
 
     public String getUrlObject(String filePath) {

@@ -1,8 +1,11 @@
 package com.eboy;
 
 import com.eboy.data.EbayAdService;
+import com.eboy.data.ExtendedAd;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
+import com.eboy.data.keyPhraseModel.KeyPhraseModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.eboy.mv.ComputerVision;
 import com.eboy.platform.Platform;
 import com.eboy.subscriptions.SubscriptionPersister;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,9 +56,9 @@ public class BaseController {
     @RequestMapping("/subscribe")
     public void subscribe() {
 
-        String key = "hey";
+        String key = "Deutsche Bahn";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(), key, 12.4f));
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(1507500000000L), 1234L, key, 12.4f));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }
@@ -76,9 +80,31 @@ public class BaseController {
         return this.textAnalyser.analyzeAds(ads);
     }
 
+    @RequestMapping("/find-mac-ssd-gold")
+    public String getMacSSD() throws IOException {
+
+        ArrayList<String> keywords = new ArrayList<>();
+        keywords.add("macbook");
+        keywords.add("ssd");
+
+        List<Ad> ads = adService.getAdsForKeywords(keywords);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = this.textAnalyser.analyzeAds(ads);
+        KeyPhraseModel keyPhrases = mapper.readValue(json, KeyPhraseModel.class);
+
+        ArrayList<ExtendedAd> extAds = new ArrayList<>();
+
+        for (Ad ad : ads) {
+
+            extAds.add(new ExtendedAd(ad, keyPhrases));
+        }
+
+        return "Sucess!";
+    }
+
     @RequestMapping("/analyzeImage")
     public String getCategorieOfAnImage() {
-        this.imageAnalyzer.analyzeImage()
         return this.imageAnalyzer.analyzeImage(
                 //TODO: image url should be the telegram fileserver image url sent to the chatbot.
                 "{\"url\": \"http://assets.inhabitat.com/wp-content/blogs.dir/1/files/2015/12/Fortified-Bicycle-Invincible-Theft-Proof-Bike-10.jpg\"}"

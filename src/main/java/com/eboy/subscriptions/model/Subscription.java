@@ -9,19 +9,21 @@ public class Subscription implements Serializable {
 
     Long userId;
     Platform platform;
-    Date lastAd;
+    Date lastAdDate;
+    Long lastAd;
     String keywords;
     Float price;
 
     public Subscription() {
     }
 
-    public Subscription(Long userId, Platform platform, Date lastAd, String keywords, Float price) {
+    public Subscription(Long userId, Platform platform, Date lastAdDate, Long lastAd, String keywords, Float price) {
         this.userId = userId;
         this.platform = platform;
-        this.lastAd = lastAd;
+        this.lastAdDate = lastAdDate;
         this.keywords = keywords;
         this.price = price;
+        this.lastAd = lastAd;
     }
 
     public Long getUserId() {
@@ -32,8 +34,8 @@ public class Subscription implements Serializable {
         return platform;
     }
 
-    public Date getLastAd() {
-        return lastAd;
+    public Date getLastAdDate() {
+        return lastAdDate;
     }
 
     public String getKeywords() {
@@ -44,8 +46,16 @@ public class Subscription implements Serializable {
         return price;
     }
 
-    public void setLastAd(Date lastAd) {
+    public Long getLastAd() {
+        return lastAd;
+    }
+
+    public void setLastAd(Long lastAd) {
         this.lastAd = lastAd;
+    }
+
+    public void setLastAdDate(Date lastAdDate) {
+        this.lastAdDate = lastAdDate;
     }
 
     @Override
@@ -53,6 +63,7 @@ public class Subscription implements Serializable {
         return "Subscription{" +
                 "userId=" + userId +
                 ", platform=" + platform +
+                ", lastAdDate=" + lastAdDate +
                 ", lastAd=" + lastAd +
                 ", keywords='" + keywords + '\'' +
                 ", price=" + price +

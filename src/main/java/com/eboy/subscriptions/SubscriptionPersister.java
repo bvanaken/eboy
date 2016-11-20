@@ -63,8 +63,19 @@ public class SubscriptionPersister {
 
         if (list == null) {
             list = new ArrayList<>();
+        } else {
+
+            for (Subscription oldSub : list) {
+
+                // if user exists for this key, replace it
+                if (oldSub.getUserId().equals(subscription.getUserId())) {
+                    list.set(list.indexOf(oldSub), subscription);
+                }
+            }
         }
-        list.add(subscription);
+        if (!list.contains(subscription)) {
+            list.add(subscription);
+        }
 
         try {
             String jsonInString = mapper.writeValueAsString(list);
