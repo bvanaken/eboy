@@ -29,8 +29,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.text.NumberFormat;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -139,11 +139,23 @@ public class OutgoingMessageService {
         }
 
         switch (intent) {
-//            case yes:
-//            case no:
-//            case triggerSubscribe:
-//
+            case yes:
+                if (query.isComplete()) {
+                    this.sendText("Great, you will get a notification, once there's a new item.", String.valueOf(userId), event.getPlatform());
+                    break;
+                }
 
+            case no:
+                if (query.isComplete()) {
+                    this.sendText("Alright, just let me know, when you're up for something else.", String.valueOf(userId), event.getPlatform());
+                    break;
+                }
+
+            case triggerSubscribe:
+
+                this.sendText("Do you want me to notify you once a new " + query.getMainKeyword() + " with this features is available?", String.valueOf(userId), event.getPlatform());
+                break;
+            
             case getItem:
 
                 Optional<LuisEntity> itemType = entities.stream().filter(v -> v.getType().equals("itemType")).findFirst();
@@ -183,11 +195,10 @@ public class OutgoingMessageService {
 
                 break;
             case getPriceRange:
-                Optional<LuisEntity> priceMax = entities.stream().filter(v -> v.getType().equals("priceRangeType::EndingAt")).findFirst();
 
-                String price = priceMax.isPresent() ? priceMax.get().getEntity() : null;
+                String number = findNumber(response.getQuery());
 
-                query.setMaxPrice(400f);
+                query.setMaxPrice(Float.valueOf(number));
                 queryPersister.persistSearchQuery(userId, query);
 
                 onQueryExtended(query, "", userId, event.getPlatform());
