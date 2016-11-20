@@ -34,12 +34,11 @@ public class EbayAdService {
         this.restTemplate = restTemplate;
     }
 
-    public List<Ad> getAdsForKeywords(List<String> keywords) {
-        return this.getAdsForKeywords(keywords, null, null);
+    public EbayResponse getAdsRequest(List<String> keywords) {
+        return this.getAdsRequest(keywords, null, null);
     }
 
-    public List<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
-
+    private EbayResponse getAdsRequest(List<String> keywords, Float priceMax, Boolean isBerlin) {
         String url = BASE_STRING;
 
         for (String keyword : keywords) {
@@ -66,8 +65,25 @@ public class EbayAdService {
 
         logger.info("Ebay URL requested: " + url);
 
-        return responseBody.getAdsObject().getAdsValue().getAds();
+        return responseBody;
+    }
 
+    public int getNumberOfAdsForKeywords(List<String> keywords) {
+        return this.getNumberOfAdsForKeywords(keywords, null, null);
+    }
+
+    public int getNumberOfAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
+        EbayResponse adsRequest = this.getAdsRequest(keywords, priceMax, isBerlin);
+        return Integer.parseInt(adsRequest.getAdsObject().getAdsValue().getPaging().getEntriesFound());
+    }
+
+    public List<Ad> getAdsForKeywords(List<String> keywords) {
+        return this.getAdsForKeywords(keywords, null, null);
+    }
+
+    public List<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
+        EbayResponse adsRequest = this.getAdsRequest(keywords, priceMax, isBerlin);
+        return adsRequest.getAdsObject().getAdsValue().getAds();
     }
 
     public Ad getLatestAd(List<String> keywords) {

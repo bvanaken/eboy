@@ -5,10 +5,7 @@ import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.data.EbayAdService;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.dto.Price;
-import com.eboy.event.ImageRecognitionEvent;
-import com.eboy.event.IntentEvent;
-import com.eboy.event.NotifyEvent;
-import com.eboy.event.SpecifyEvent;
+import com.eboy.event.*;
 import com.eboy.mv.model.Recognition;
 import com.eboy.mv.model.Tag;
 import com.eboy.nlp.Intent;
@@ -197,5 +194,15 @@ public class OutgoingMessageService {
         sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
         sb.append(NEW_LINE);
         return sb.toString();
+    }
+
+    @Subscribe
+    public void handleEvent(StartEvent event) {
+        sendText("Hey, may I help you? Do you want to buy or do you want to sell something?",String.valueOf(event.getUserId()), event.platform);
+    }
+
+    @Subscribe
+    public void handleEvent(NoClueEvent event) {
+        sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);
     }
 }

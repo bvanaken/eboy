@@ -2,6 +2,9 @@ package com.eboy.platform.telegram;
 
 import com.eboy.data.EbayAdService;
 import com.eboy.event.ImageRecognitionEvent;
+import com.eboy.event.MessageEvent;
+import com.eboy.event.NoClueEvent;
+import com.eboy.event.StartEvent;
 import com.eboy.mv.ComputerVision;
 import com.eboy.mv.model.Recognition;
 import com.eboy.nlp.luis.LuisProcessor;
@@ -51,9 +54,10 @@ public class TelegramWebhookController {
 
     private final static Logger logger = Logger.getLogger(TelegramWebhookController.class.getName());
 
+    private final static String START_COMMAND = "/start";
+
     @RequestMapping(value = "/telegram/webhook", method = POST)
     public void receiveUpdate(@RequestBody com.eboy.platform.telegram.model.Update update) throws IOException {
-        logger.info("Chat id: " + update.toString());
 
         Long chatId = update.getMessage().getChat().getId();
         String text = update.getMessage().getText();
@@ -63,14 +67,20 @@ public class TelegramWebhookController {
         boolean isPhotoMessage = message.getPhoto() != null && message.getPhoto().length > 0;
 
         if (isTextMessage) {
-            // do luis stuff
-            return;
+            boolean isStartCommand = message.getText().toLowerCase().equals(START_COMMAND);
+            if (isStartCommand) {
+                eventBus.post(new StartEvent(chatId, Platform.TELEGRAM));
+                return;
+            } else {
+                eventBus.post(new MessageEvent(chatId, text, Platform.TELEGRAM));
+                return;
+            }
         } else {
             if (isPhotoMessage) {
                 handleTelegramPhoto(message);
                 return;
             }
-            // rip
+            eventBus.post(new NoClueEvent(chatId, Platform.TELEGRAM));
             return;
         }
     }
@@ -82,7 +92,7 @@ public class TelegramWebhookController {
         TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
         int length = message.getPhoto().length;
         TelegramFile[] photo = message.getPhoto();
-        
+
         TelegramFile telegramFile = photo[length - 1];
 
         String fileId = telegramFile.fileId;
