@@ -82,6 +82,7 @@ public class TelegramWebhookController {
         TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
         int length = message.getPhoto().length;
         TelegramFile[] photo = message.getPhoto();
+        
         TelegramFile telegramFile = photo[length - 1];
 
         String fileId = telegramFile.fileId;

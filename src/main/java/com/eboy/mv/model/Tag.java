@@ -5,11 +5,13 @@ package com.eboy.mv.model;
  */
 public class Tag {
     public String name;
-    public double score;
+    public double confidence;
+    public String hint;
 
-    public Tag(String name, double score) {
+    public Tag(String name, double confidence, String hint) {
         this.name = name;
-        this.score = score;
+        this.confidence = confidence;
+        this.hint = hint;
     }
 
     public Tag() {
