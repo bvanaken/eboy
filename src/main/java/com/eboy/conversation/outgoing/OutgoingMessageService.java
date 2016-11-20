@@ -36,19 +36,19 @@ public class OutgoingMessageService {
 
     private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
     private final String GENERAL_PREFIX = "general";
+    MsTextAnalyticService textAnalyser;
     private MessageService facebookMessageService;
     private MessageService telegramMessageService;
     private OutgoingMessageHelper messageHelper;
     private SubscriptionPersister persister;
-
     @Autowired
     private QueryPersister queryPersister;
     @Autowired
     private EbayAdService adService;
-    MsTextAnalyticService textAnalyser;
     @Autowired
     private EventBus eventBus;
     private Map<String, List<MessageEntry>> generalMessageMap;
+    private List<Tag> tagsToKick = new ArrayList<>();
 
     @Autowired
     public OutgoingMessageService(@Qualifier(FacebookMessageService.QUALIFIER) MessageService facebookMessageService, @Qualifier(TelegramMessageService.QUALIFIER) MessageService telegramMessageService, OutgoingMessageHelper messageHelper,
@@ -59,6 +59,11 @@ public class OutgoingMessageService {
         this.persister = persister;
 
         this.generalMessageMap = this.messageHelper.loadMessageMap(OutgoingMessageHelper.Domain.GENERAL);
+
+        tagsToKick.add(new Tag("ground"));
+        tagsToKick.add(new Tag("floor"));
+        tagsToKick.add(new Tag("indoor"));
+        tagsToKick.add(new Tag("furniture"));
     }
 
     public void sendText(String text, String userId, Platform platform) {
@@ -210,9 +215,11 @@ public class OutgoingMessageService {
 
         // instantiate QueryObject
 
-        Tag[] categories = recognition.tags;
+        List<Tag> categories = recognition.tags;
 
-        Tag tag = categories[categories.length - 1];
+        categories.removeAll(tagsToKick);
+
+        Tag tag = categories.get(0);
 
         this.sendText(tag.name, String.valueOf(userId), event.platform);
     }
