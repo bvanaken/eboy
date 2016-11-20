@@ -9,6 +9,8 @@ import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.LuisProcessor;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.update.Event;
+import com.eboy.platform.telegram.model.Message;
+import com.eboy.platform.telegram.model.MessageEntity;
 import com.google.common.eventbus.EventBus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -42,9 +44,26 @@ public class TelegramWebhookController {
         Long chatId = update.getMessage().getChat().getId();
         String text = update.getMessage().getText();
 
-        Intent intent = luisProcessor.getIntentFromText(update.getMessage().getText());
+        Message message = update.getMessage();
+        boolean isTextMessage = message.getText() != null;
+        boolean isPhotoMessage = message.getPhoto() != null;
 
-        List<String> keywords = new ArrayList<String>();
+        if(isTextMessage) {
+            // do luis stuff
+            return;
+        }else{
+            if(isPhotoMessage) {
+                // do image recognition
+                return;
+            }
+            return;
+        }
+
+        /*Intent intent = luisProcessor.getIntentFromText();
+
+        MessageEntity[] entities = update.getMessage().getEntities();*/
+
+        /*List<String> keywords = new ArrayList<String>();
         keywords.add(text);
 
         List<Ad> adsForKeywords = ebayAdService.getAdsForKeywords(keywords);
@@ -56,6 +75,6 @@ public class TelegramWebhookController {
         }
 
         LatestAdEvent event = new LatestAdEvent(chatId, latestAd, Platform.TELEGRAM);
-        eventBus.post(event);
+        eventBus.post(event);*/
     }
 }
