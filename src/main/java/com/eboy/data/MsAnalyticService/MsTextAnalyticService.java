@@ -74,6 +74,4 @@ public class MsTextAnalyticService {
 
         return headers;
     }
-    
-
 }

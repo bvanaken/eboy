@@ -1,16 +1,14 @@
 package com.eboy.conversation.outgoing;
 
-import com.eboy.conversation.outgoing.dto.Button;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
-import com.eboy.conversation.outgoing.dto.MessagePayload;
+import com.eboy.data.dto.Ad;
+import com.eboy.data.dto.Price;
 import com.eboy.event.IntentEvent;
-import com.eboy.nlp.Intent;
+import com.eboy.event.NotifyEvent;
 import com.eboy.platform.MessageService;
-import com.eboy.platform.MessageType;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
-import com.eboy.platform.telegram.TelegramWebhookController;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,13 +50,13 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(IntentEvent event) {
-        Assert.notNull(event.key);
-        Assert.notNull(event.userId);
-
-        logger.info("handle event: " + event.key);
-
         String key = event.key;
         Long userId = event.userId;
+
+        Assert.notNull(key);
+        Assert.notNull(userId);
+
+        logger.info("handle event: " + event.key);
 
         Map<String, List<MessageEntry>> messageMap = this.generalMessageMap;
 
@@ -78,6 +76,20 @@ public class OutgoingMessageService {
                 this.sendText(text, String.valueOf(userId), event.platform);
             }
         }
+    }
+
+    @Subscribe
+    public void handleEvent(NotifyEvent event) {
+        Ad data = event.data;
+        Long userId = event.userId;
+
+        Assert.notNull(data);
+        Assert.notNull(userId);
+
+        logger.info("Handle latest Ad.");
+
+        String lastAdMessage = lastAdMessage(data);
+        this.sendText(lastAdMessage, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {
@@ -102,5 +114,19 @@ public class OutgoingMessageService {
             }
         }
         return null;
+    }
+
+    private String lastAdMessage(Ad ad) {
+        Price price = ad.getPrice();
+        Double amount = (Double) price.getAmount().getValue();
+        StringBuilder sb = new StringBuilder();
+        String NEW_LINE = "\n";
+        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
+        sb.append(NEW_LINE);
+        sb.append("The price for the item is: " + amount + "\n");
+        sb.append(NEW_LINE);
+        sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
+        sb.append(NEW_LINE);
+        return sb.toString();
     }
 }
