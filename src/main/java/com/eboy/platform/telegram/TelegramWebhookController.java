@@ -3,11 +3,13 @@ package com.eboy.platform.telegram;
 import com.eboy.data.EbayAdService;
 import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.mv.ComputerVision;
+import com.eboy.mv.model.Recognition;
 import com.eboy.nlp.luis.LuisProcessor;
 import com.eboy.platform.Platform;
 import com.eboy.platform.telegram.model.Message;
 import com.eboy.platform.telegram.model.TelegramFile;
 import com.eboy.platform.telegram.model.response.FileResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.TelegramBotAdapter;
@@ -25,6 +27,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class TelegramWebhookController {
+
+    ObjectMapper mapper;
+
+    public TelegramWebhookController() {
+        mapper = new ObjectMapper();
+    }
 
     @Autowired
     private EventBus eventBus;
@@ -74,6 +82,7 @@ public class TelegramWebhookController {
         TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
         int length = message.getPhoto().length;
         TelegramFile[] photo = message.getPhoto();
+        
         TelegramFile telegramFile = photo[length - 1];
 
         String fileId = telegramFile.fileId;
@@ -90,8 +99,14 @@ public class TelegramWebhookController {
         String urlObject = getUrlObject(fileUrl);
         String keyword = imageAnalyzer.analyzeImage(urlObject);
 
-        logger.info(keyword);
-        eventBus.post(new ImageRecognitionEvent(message.getChat().getId(), Platform.TELEGRAM, keyword));
+        try {
+            Recognition recognition = mapper.readValue(keyword, Recognition.class);
+            logger.info(keyword);
+            eventBus.post(new ImageRecognitionEvent(message.getChat().getId(), Platform.TELEGRAM, recognition));
+        } catch (IOException e) {
+            // maybe send error event
+            e.printStackTrace();
+        }
     }
 
     public String getUrlObject(String filePath) {
