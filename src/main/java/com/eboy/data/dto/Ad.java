@@ -115,4 +115,40 @@ public class Ad {
                 ", links=" + links +
                 '}';
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
+    public void setType(Field type) {
+        this.type = type;
+    }
+
+    public void setTitle(Field title) {
+        this.title = title;
+    }
+
+    public void setDescription(Field description) {
+        this.description = description;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setStatus(Field status) {
+        this.status = status;
+    }
+
+    public void setDateTime(Field dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setLinks(List<Link> links) {
+        this.links = links;
+    }
 }

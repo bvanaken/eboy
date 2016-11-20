@@ -108,7 +108,7 @@ public class BaseController {
     @RequestMapping("/persist")
     public String persistQuery() {
 
-        queryPersister.persistSearchQuery(12345L, new SearchQuery(400f, false, "word", "extra"));
+        queryPersister.persistSearchQuery(12345L, new SearchQuery(400f, false, "word"));
 
         SearchQuery searchQuery = queryPersister.getSearchQuery(12345L);
 

@@ -21,6 +21,7 @@ import com.eboy.subscriptions.QueryPersister;
 import com.eboy.subscriptions.SubscriberService;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.eboy.subscriptions.model.SellerInfo;
+import com.eboy.subscriptions.model.Subscription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -41,11 +42,15 @@ public class OutgoingMessageService {
 
     private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
     private final String GENERAL_PREFIX = "general";
+
+    @Autowired
     MsTextAnalyticService textAnalyser;
+
     private MessageService facebookMessageService;
     private MessageService telegramMessageService;
     private OutgoingMessageHelper messageHelper;
     private SubscriptionPersister persister;
+
     @Autowired
     private QueryPersister queryPersister;
     @Autowired
@@ -86,7 +91,7 @@ public class OutgoingMessageService {
 
         List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(keyword));
 
-        SearchQuery searchQuery = new SearchQuery(null, null, keyword, null);
+        SearchQuery searchQuery = new SearchQuery(null, null, keyword);
 
         if (ads == null || ads.isEmpty()) {
             eventBus.post(new AskUpdateEvent(userId, searchQuery, platform));
@@ -110,15 +115,16 @@ public class OutgoingMessageService {
 
         if (searchQuery.getMaxPrice() == null) {
             this.sendText(extraKeywords + ", cool. Any price limit from your side?", String.valueOf(userId), platform);
-
-        } else if (searchQuery.getBerlin() == null) {
+            return;
+        }
+        if (searchQuery.getBerlin() == null) {
             this.sendText("Sounds good. Do you want to search in a specific city?", String.valueOf(userId), platform);
 
         } else {
 
             this.sendText("I got it! Let's see what is out there...", String.valueOf(userId), platform);
 
-            List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword(), searchQuery.getExtraKeyword()));
+            List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword()), searchQuery.getMaxPrice(), searchQuery.getBerlin());
 
             eventBus.post(new NotifyEvent(userId, platform, ads.get(0), searchQuery));
 
@@ -136,27 +142,30 @@ public class OutgoingMessageService {
 
         SearchQuery query = queryPersister.getSearchQuery(userId);
         if (query == null) {
-            query = new SearchQuery(null, null, null, null);
+            query = new SearchQuery(null, null, null);
         }
 
         switch (intent) {
             case yes:
                 if (query.isComplete()) {
                     this.sendText("Great, you will get a notification, once there's a new item.", String.valueOf(userId), event.getPlatform());
-                    break;
+
+                    Subscription subscription = new Subscription(userId, event.getPlatform(), null, null, query.getMainKeyword(), query.getMaxPrice(), query.getBerlin());
+                    persister.persistSubscription(String.valueOf(userId), subscription);
                 }
+                break;
 
             case no:
                 if (query.isComplete()) {
                     this.sendText("Alright, just let me know, when you're up for something else.", String.valueOf(userId), event.getPlatform());
-                    break;
                 }
+                break;
 
             case triggerSubscribe:
 
                 this.sendText("Do you want me to notify you once a new " + query.getMainKeyword() + " with this features is available?", String.valueOf(userId), event.getPlatform());
                 break;
-            
+
             case getItem:
 
                 Optional<LuisEntity> itemType = entities.stream().filter(v -> v.getType().equals("itemType")).findFirst();
@@ -173,6 +182,10 @@ public class OutgoingMessageService {
                 for (LuisEntity entity : entities) {
                     keywords += entity.getEntity() + " ";
                 }
+                if (keywords.length() > 0) {
+                    keywords = keywords.substring(0, keywords.length() - 1);
+                }
+
                 query.setMainKeyword(query.getMainKeyword() + " " + keywords);
                 queryPersister.persistSearchQuery(userId, query);
 
@@ -184,7 +197,7 @@ public class OutgoingMessageService {
                 String locEntity = locationType.isPresent() ? locationType.get().getEntity().toLowerCase() : null;
                 String locType = locationType.isPresent() ? locationType.get().getType() : null;
 
-                if (("locationType::districtOfBerlin").equals(locEntity) || ("berlin").equals(locType)) {
+                if (("locationType::districtOfBerlin").equals(locType) || ("berlin").equals(locEntity)) {
 
                     query.setBerlin(true);
                 } else {
@@ -209,10 +222,13 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(NotifyEvent event) throws IOException {
-        Ad data = event.data;
+        Ad data = event.getData();
 
         ObjectMapper mapper = new ObjectMapper();
-        List<Ad> ads = new ArrayList<>(Arrays.asList(data));
+
+        List<Ad> ads = new ArrayList<>();
+        ads.add(data);
+
         String json = this.textAnalyser.analyzeAds(ads);
         KeyPhraseModel keyPhrases = mapper.readValue(json, KeyPhraseModel.class);
 
@@ -245,7 +261,7 @@ public class OutgoingMessageService {
 
         categories.removeAll(tagsToKick);
 
-        if(categories.isEmpty()) {
+        if (categories.isEmpty()) {
             this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me, what you are looking for!", String.valueOf(userId), event.platform);
             return;
         }
@@ -307,28 +323,33 @@ public class OutgoingMessageService {
     @Subscribe
     public void handleEvent(SellEvent event) {
         SellerInfo info = subscriberService.getInfoForKeyword(event.getKeywords());
-
         String userId = String.valueOf(event.getUserId());
         Platform platform = event.getPlatform();
 
-        Integer subscribers = info.getNumberSubscribers();
+        if(info != null){
 
-        Float priceMin = info.getPriceMin();
-        Float priceMax = info.getPriceMax();
+            Integer subscribers = info.getNumberSubscribers();
 
-        if (subscribers < 0) {
-            sendText("Bummer, there's no one directly subscribed to your article at the moment. Maybe you should wait a bit or just try your luck on the market!", userId, platform);
+            Float priceMin = info.getPriceMin();
+            Float priceMax = info.getPriceMax();
 
-        } else if (subscribers < 5) {
-            sendText("There are currently " + subscribers + " looking for your article. The price range is between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+            if (subscribers < 0) {
+                sendText("Bummer, there's no one directly subscribed to your article at the moment. Maybe you should wait a bit or just try your luck on the market!", userId, platform);
 
+            } else if (subscribers < 5) {
+                sendText("There are currently " + subscribers + " looking for your article. The price range is between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+
+            } else {
+                sendText("I think that's a great idea! There are currently " + subscribers + " looking for your article. Just the right time to sell! The price range lies between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+            }
         } else {
-            sendText("I think that's a great idea! There are currently " + subscribers + " looking for your article. Just the right time to sell! The price range lies between " + priceMin + " € and " + priceMax + " €.", userId, platform);
+            sendText("Bummer, there's no one directly subscribed to your article at the moment. Maybe you should wait a bit or just try your luck on the market!", userId, platform);
         }
+
     }
 
     public String findNumber(String text) {
-        Pattern p = Pattern.compile("/([0-9])/g");
+        Pattern p = Pattern.compile("[\\d,]+");
 
         Matcher m = p.matcher(text);
 

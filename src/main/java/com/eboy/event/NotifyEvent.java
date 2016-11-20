@@ -21,6 +21,10 @@ public class NotifyEvent {
         this.searchQuery = searchQuery;
     }
 
+    public NotifyEvent() {
+        //
+    }
+
     public Long getUserId() {
         return userId;
     }
@@ -35,5 +39,21 @@ public class NotifyEvent {
 
     public Ad getData() {
         return data;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
+
+    public void setData(Ad data) {
+        this.data = data;
+    }
+
+    public void setSearchQuery(SearchQuery searchQuery) {
+        this.searchQuery = searchQuery;
     }
 }

@@ -1,5 +1,7 @@
 package com.eboy.conversation.incoming;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Created by root1 on 20/11/16.
  */
@@ -8,16 +10,14 @@ public class SearchQuery {
     private Float maxPrice;
     private Boolean isBerlin;
     private String mainKeyword;
-    private String extraKeyword;
 
     public SearchQuery() {
     }
 
-    public SearchQuery(Float maxPrice, Boolean isBerlin, String mainKeyword, String extraKeyword) {
+    public SearchQuery(Float maxPrice, Boolean isBerlin, String mainKeyword) {
         this.maxPrice = maxPrice;
         this.isBerlin = isBerlin;
         this.mainKeyword = mainKeyword;
-        this.extraKeyword = extraKeyword;
     }
 
     public Float getMaxPrice() {
@@ -44,19 +44,11 @@ public class SearchQuery {
         this.mainKeyword = mainKeyword;
     }
 
-    public String getExtraKeyword() {
-        return extraKeyword;
-    }
-
-    public void setExtraKeyword(String extraKeyword) {
-        this.extraKeyword = extraKeyword;
-    }
-
+    @JsonIgnore
     public boolean isComplete() {
         return (this.maxPrice != null &&
                 this.isBerlin != null &&
-                this.mainKeyword != null &&
-                this.extraKeyword != null);
+                this.mainKeyword != null);
     }
 
     @Override
@@ -65,7 +57,6 @@ public class SearchQuery {
                 "maxPrice=" + maxPrice +
                 ", isBerlin=" + isBerlin +
                 ", mainKeyword='" + mainKeyword + '\'' +
-                ", extraKeyword='" + extraKeyword + '\'' +
                 '}';
     }
 }

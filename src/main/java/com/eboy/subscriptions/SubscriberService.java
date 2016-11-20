@@ -3,9 +3,11 @@ package com.eboy.subscriptions;
 import com.eboy.subscriptions.model.SellerInfo;
 import com.eboy.subscriptions.model.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class SubscriberService {
 
     SubscriptionPersister persister;
@@ -19,24 +21,28 @@ public class SubscriberService {
 
         List<Subscription> subscriptions = persister.getSubscriptions(keyword);
 
-        Float minPrice = Float.MAX_VALUE;
-        Float maxPrice = Float.MIN_VALUE;
+        if(subscriptions != null){
 
-        for (Subscription sub : subscriptions) {
+            Float minPrice = Float.MAX_VALUE;
+            Float maxPrice = Float.MIN_VALUE;
 
-            Float price = sub.getPrice();
-            if (price < minPrice) {
-                minPrice = price;
+            for (Subscription sub : subscriptions) {
+
+                Float price = sub.getPrice();
+                if (price < minPrice) {
+                    minPrice = price;
+                }
+                if (price > maxPrice) {
+                    maxPrice = price;
+                }
             }
-            if (price > maxPrice) {
-                maxPrice = price;
+
+            if (minPrice.equals(Float.MAX_VALUE)) {
+                minPrice = 0f;
             }
+            return new SellerInfo(subscriptions.size(), minPrice, maxPrice);
         }
 
-        if (minPrice.equals(Float.MAX_VALUE)) {
-            minPrice = 0f;
-        }
-        return new SellerInfo(subscriptions.size(), minPrice, maxPrice);
-
+        return null;
     }
 }
