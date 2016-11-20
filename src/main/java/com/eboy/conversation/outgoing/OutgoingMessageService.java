@@ -89,7 +89,7 @@ public class OutgoingMessageService {
 
     public void onKeywordDetected(String keyword, Long userId, Platform platform) {
 
-        List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(keyword));
+        ArrayList<Ad> ads = adService.getAdsForKeywords(Arrays.asList(keyword));
 
         SearchQuery searchQuery = new SearchQuery(null, null, keyword);
 

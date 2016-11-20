@@ -1,11 +1,12 @@
 package com.eboy.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class Ad {
 
@@ -34,10 +35,10 @@ public class Ad {
     Field dateTime;
 
     @JsonProperty(value = "link")
-    List<Link> links;
+    ArrayList<Link> links;
 
     @JsonProperty(value = "pictures")
-    List<Picture> pictures;
+    Pictures pictures;
 
     public Ad() {
     }
@@ -89,19 +90,20 @@ public class Ad {
         }
     }
 
-    public List<Link> getLinks() {
+    public ArrayList<Link> getLinks() {
         return links;
     }
 
-    public List<Picture> getPictures() {
+    public Pictures getPictures() {
         return pictures;
     }
 
+    @JsonIgnore
     public String getPublicPicture() {
 
-        if (pictures != null && !pictures.isEmpty()) {
+        if (pictures != null && pictures.getPicture() != null && !pictures.getPicture().isEmpty()) {
 
-            Picture pic = pictures.get(0);
+            Picture pic = pictures.getPicture().get(0);
 
             for (Link link : pic.getLinks()) {
                 if (link.getRel().equals("teaser")) {
@@ -171,7 +173,7 @@ public class Ad {
         this.dateTime = dateTime;
     }
 
-    public void setLinks(List<Link> links) {
+    public void setLinks(ArrayList<Link> links) {
         this.links = links;
     }
 }

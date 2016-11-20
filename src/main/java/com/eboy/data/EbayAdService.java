@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -77,11 +78,11 @@ public class EbayAdService {
         return Integer.parseInt(adsRequest.getAdsObject().getAdsValue().getPaging().getEntriesFound());
     }
 
-    public List<Ad> getAdsForKeywords(List<String> keywords) {
+    public ArrayList<Ad> getAdsForKeywords(List<String> keywords) {
         return this.getAdsForKeywords(keywords, null, null);
     }
 
-    public List<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
+    public ArrayList<Ad> getAdsForKeywords(List<String> keywords, Float priceMax, Boolean isBerlin) {
         EbayResponse adsRequest = this.getAdsRequest(keywords, priceMax, isBerlin);
         return adsRequest.getAdsObject().getAdsValue().getAds();
     }

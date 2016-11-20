@@ -26,7 +26,7 @@ public class SubscriptionPersister {
         this.mapper = new ObjectMapper();
     }
 
-    public List<Subscription> getSubscriptions(final String key) {
+    public ArrayList<Subscription> getSubscriptions(final String key) {
         Assert.notNull(key);
 
         String object = (String) redisTemplate.opsForValue().get(key);
@@ -34,7 +34,7 @@ public class SubscriptionPersister {
         if (object != null) {
 
             try {
-                List<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
+                ArrayList<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
                 });
 
                 return list;

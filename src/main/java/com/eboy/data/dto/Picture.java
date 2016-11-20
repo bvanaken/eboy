@@ -1,9 +1,12 @@
 package com.eboy.data.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class Picture {
 
+    @JsonProperty("link")
     List<Link> links;
 
     public Picture() {

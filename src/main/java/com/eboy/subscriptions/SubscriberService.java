@@ -5,7 +5,7 @@ import com.eboy.subscriptions.model.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class SubscriberService {
@@ -19,7 +19,7 @@ public class SubscriberService {
 
     public SellerInfo getInfoForKeyword(String keyword) {
 
-        List<Subscription> subscriptions = persister.getSubscriptions(keyword);
+        ArrayList<Subscription> subscriptions = persister.getSubscriptions(keyword);
 
         if(subscriptions != null){
 
