@@ -56,7 +56,7 @@ public class LuisProcessor implements TextProcessor {
                     Intent highestScoredIntent = intent.getIntent();
                     logger.info("LUIS identified Intent: " + highestScoredIntent);
 
-                    eventBus.post(new IntentEvent(event.getUserId(), highestScoredIntent, event.getPlatform()));
+                    eventBus.post(new IntentEvent(event.getUserId(), queryResponse, event.getPlatform()));
                 }
             }
 

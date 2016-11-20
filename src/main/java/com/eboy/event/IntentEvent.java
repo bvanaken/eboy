@@ -1,6 +1,6 @@
 package com.eboy.event;
 
-import com.eboy.nlp.Intent;
+import com.eboy.nlp.luis.model.LuisQueryResponse;
 import com.eboy.platform.Platform;
 
 /**
@@ -10,10 +10,10 @@ public class IntentEvent {
 
     public Long userId;
     public Platform platform;
-    public Intent intent;
+    public LuisQueryResponse luisResponse;
 
-    public IntentEvent(Long userId, Intent intent, Platform platform) {
-        this.intent = intent;
+    public IntentEvent(Long userId, LuisQueryResponse luisResponse, Platform platform) {
+        this.luisResponse = luisResponse;
         this.userId = userId;
         this.platform = platform;
     }
@@ -26,7 +26,7 @@ public class IntentEvent {
         return platform;
     }
 
-    public Intent getIntent() {
-        return intent;
+    public LuisQueryResponse getLuisResponse() {
+        return luisResponse;
     }
 }

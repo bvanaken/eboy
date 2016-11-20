@@ -6,6 +6,7 @@ import com.eboy.data.dto.Price;
 import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.NotifyEvent;
+import com.eboy.nlp.Intent;
 import com.eboy.platform.MessageService;
 import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 
 @Service
@@ -51,31 +54,12 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(IntentEvent event) {
-        String key = event.key;
-        Long userId = event.userId;
 
-        Assert.notNull(key);
-        Assert.notNull(userId);
+        Long userId = event.getUserId();
+        Intent intent = event.getIntent();
 
-        logger.info("handle event: " + event.key);
-
-        Map<String, List<MessageEntry>> messageMap = this.generalMessageMap;
-
-        if (messageMap != null) {
-
-            List<MessageEntry> messageEntries = messageMap.get(key);
-
-            if (messageEntries != null && messageEntries.size() > 0) {
-
-                // Get random message
-                Random rand = new Random();
-                int index = rand.nextInt(messageEntries.size());
-
-                MessageEntry messageEntry = messageEntries.get(index);
-                String text = messageEntry.getText();
-
-                this.sendText(text, String.valueOf(userId), event.platform);
-            }
+        switch (intent) {
+            case getFilter:
         }
     }
 
