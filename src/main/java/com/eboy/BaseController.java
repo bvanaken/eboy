@@ -3,6 +3,7 @@ package com.eboy;
 import com.eboy.data.EbayAdService;
 import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
+import com.eboy.mv.ComputerVision;
 import com.eboy.platform.Platform;
 import com.eboy.subscriptions.SubscriptionPersister;
 import com.eboy.subscriptions.model.Subscription;
@@ -19,13 +20,14 @@ public class BaseController {
 
     MsTextAnalyticService textAnalyser;
     EbayAdService adService;
+    ComputerVision imageAnalyzer;
     SubscriptionPersister persister;
 
     @Autowired
-    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer,
-                          SubscriptionPersister persister) {
+    public BaseController(EbayAdService adService, MsTextAnalyticService textAnalyzer, ComputerVision imageAnalyzer, SubscriptionPersister persister) {
         this.textAnalyser = textAnalyzer;
         this.adService = adService;
+        this.imageAnalyzer = imageAnalyzer;
         this.persister = persister;
     }
 
@@ -72,6 +74,14 @@ public class BaseController {
 
         List<Ad> ads = this.getAds();
         return this.textAnalyser.analyzeAds(ads);
+    }
+
+    @RequestMapping("/analyzeImage")
+    public String getCategorieOfAnImage() {
+        return this.imageAnalyzer.analyzeImage(
+                //TODO: image url should be the telegram fileserver image url sent to the chatbot.
+                "{\"url\": \"http://assets.inhabitat.com/wp-content/blogs.dir/1/files/2015/12/Fortified-Bicycle-Invincible-Theft-Proof-Bike-10.jpg\"}"
+        );
     }
 }
 

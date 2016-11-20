@@ -1,7 +1,10 @@
 package com.eboy.platform.telegram;
 
 import com.eboy.conversation.incoming.EventProcessor;
+import com.eboy.data.EbayAdService;
+import com.eboy.data.dto.Ad;
 import com.eboy.event.IntentEvent;
+import com.eboy.event.LatestAdEvent;
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.LuisProcessor;
 import com.eboy.platform.Platform;
@@ -12,6 +15,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -25,15 +30,32 @@ public class TelegramWebhookController {
     @Autowired
     private LuisProcessor luisProcessor;
 
+    @Autowired
+    private EbayAdService ebayAdService;
+
     private final static Logger logger = Logger.getLogger(TelegramWebhookController.class.getName());
 
     @RequestMapping(value = "/telegram/webhook", method = POST)
     public void receiveUpdate(@RequestBody com.eboy.platform.telegram.model.Update update) throws IOException {
         logger.info("Chat id: " + update.toString());
-        String text = update.getMessage().getText();
-        Long chatId = update.getMessage().getChat().getId();
-        eventBus.post(new IntentEvent(chatId,text, Platform.TELEGRAM));
 
-        /*Intent intent = luisProcessor.getIntentFromText(update.getMessage().getText());*/
+        Long chatId = update.getMessage().getChat().getId();
+        String text = update.getMessage().getText();
+
+        Intent intent = luisProcessor.getIntentFromText(update.getMessage().getText());
+
+        List<String> keywords = new ArrayList<String>();
+        keywords.add(text);
+
+        List<Ad> adsForKeywords = ebayAdService.getAdsForKeywords(keywords);
+
+        Ad latestAd = adsForKeywords.get(0);
+
+        if(latestAd==null) {
+            return;
+        }
+
+        LatestAdEvent event = new LatestAdEvent(chatId, latestAd, Platform.TELEGRAM);
+        eventBus.post(event);
     }
 }
