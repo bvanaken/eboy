@@ -1,5 +1,6 @@
 package com.eboy.conversation.outgoing;
 
+import com.eboy.conversation.incoming.SearchQuery;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.data.EbayAdService;
 import com.eboy.data.dto.Ad;
@@ -8,6 +9,8 @@ import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.NotifyEvent;
 import com.eboy.event.SpecifyEvent;
+import com.eboy.mv.model.Category;
+import com.eboy.mv.model.Recognition;
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.model.LuisEntity;
 import com.eboy.nlp.luis.model.LuisQueryResponse;
@@ -105,6 +108,8 @@ public class OutgoingMessageService {
                     keywords.add(entity.getEntity());
                 }
 
+                SearchQuery q = new SearchQuery();
+
                 break;
             case getLocation:
                 Optional<LuisEntity> locationType = entities.stream().filter(v -> v.getType().equals("locationType")).findFirst();
@@ -137,15 +142,22 @@ public class OutgoingMessageService {
 
     @Subscribe
     public void handleEvent(ImageRecognitionEvent event) {
-        String keywords = event.keywords;
+        Recognition recognition = event.recognition;
         Long userId = event.userId;
 
-        Assert.notNull(keywords);
+        Assert.notNull(recognition);
+        Assert.notEmpty(recognition.categories);
         Assert.notNull(userId);
 
         logger.info("Handle image recognition.");
 
-        this.sendText(keywords, String.valueOf(userId), event.platform);
+        // instantiate QueryObject
+
+        Category[] categories = recognition.categories;
+
+        Category category = categories[categories.length - 1];
+
+        this.sendText(category.name, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {

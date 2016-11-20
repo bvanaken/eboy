@@ -29,7 +29,7 @@ public class TelegramMessageService implements MessageService {
     public void sendTextMessage(final String text, final String userId) {
         TelegramBot bot = TelegramBotAdapter.build(Constants.TOKEN);
 
-        SendMessage message = new SendMessage(userId, text).parseMode(ParseMode.Markdown);
+        SendMessage message = new SendMessage(userId, text).parseMode(ParseMode.HTML);
 
         bot.execute(message, new Callback<SendMessage, com.pengrad.telegrambot.response.SendResponse>() {
             @Override
