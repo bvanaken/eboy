@@ -36,6 +36,9 @@ public class Ad {
     @JsonProperty(value = "link")
     List<Link> links;
 
+    @JsonProperty(value = "pictures")
+    List<Picture> pictures;
+
     public Ad() {
     }
 
@@ -88,6 +91,26 @@ public class Ad {
 
     public List<Link> getLinks() {
         return links;
+    }
+
+    public List<Picture> getPictures() {
+        return pictures;
+    }
+
+    public String getPublicPicture() {
+
+        if (pictures != null && !pictures.isEmpty()) {
+
+            Picture pic = pictures.get(0);
+
+            for (Link link : pic.getLinks()) {
+                if (link.getRel().equals("teaser")) {
+                    return link.getHref();
+                }
+            }
+
+        }
+        return null;
     }
 
     public String getPublicUrl() {

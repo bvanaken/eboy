@@ -374,8 +374,8 @@ public class OutgoingMessageService {
         String[] keyphrases = ad.getKeyPhrases();
         for (int i = 0; i < positives.length; i++) {
             for (int j = 0; j <keyphrases.length; j++) {
-                if (positives[i].contains(keyphrases[i].toLowerCase())){
-                    return keyphrases[i];
+                if (positives[i].contains(keyphrases[j].toLowerCase())){
+                    return keyphrases[j];
                 };
             }
         }
