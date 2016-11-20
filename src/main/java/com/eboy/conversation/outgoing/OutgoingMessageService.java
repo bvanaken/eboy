@@ -9,8 +9,8 @@ import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.NotifyEvent;
 import com.eboy.event.SpecifyEvent;
-import com.eboy.mv.model.Category;
 import com.eboy.mv.model.Recognition;
+import com.eboy.mv.model.Tag;
 import com.eboy.nlp.Intent;
 import com.eboy.nlp.luis.model.LuisEntity;
 import com.eboy.nlp.luis.model.LuisQueryResponse;
@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 @Service
 public class OutgoingMessageService {
 
+    private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
     private final String GENERAL_PREFIX = "general";
     private MessageService facebookMessageService;
     private MessageService telegramMessageService;
@@ -40,13 +41,9 @@ public class OutgoingMessageService {
     private SubscriptionPersister persister;
     @Autowired
     private EbayAdService adService;
-
     @Autowired
     private EventBus eventBus;
-
     private Map<String, List<MessageEntry>> generalMessageMap;
-
-    private final static Logger logger = Logger.getLogger(OutgoingMessageService.class.getName());
 
     @Autowired
     public OutgoingMessageService(@Qualifier(FacebookMessageService.QUALIFIER) MessageService facebookMessageService, @Qualifier(TelegramMessageService.QUALIFIER) MessageService telegramMessageService, OutgoingMessageHelper messageHelper,
@@ -147,18 +144,18 @@ public class OutgoingMessageService {
         Long userId = event.userId;
 
         Assert.notNull(recognition);
-        Assert.notEmpty(recognition.categories);
+        Assert.notEmpty(recognition.tags);
         Assert.notNull(userId);
 
         logger.info("Handle image recognition.");
 
         // instantiate QueryObject
 
-        Category[] categories = recognition.categories;
+        Tag[] categories = recognition.tags;
 
-        Category category = categories[categories.length - 1];
+        Tag tag = categories[categories.length - 1];
 
-        this.sendText(category.name, String.valueOf(userId), event.platform);
+        this.sendText(tag.name, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {
