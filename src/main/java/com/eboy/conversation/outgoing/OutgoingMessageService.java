@@ -110,7 +110,7 @@ public class OutgoingMessageService {
     public void onQueryExtended(SearchQuery searchQuery, String extraKeywords, Long userId, Platform platform) {
 
         if (searchQuery.getMainKeyword() == null) {
-            this.sendText("A great choice, but what exactly do you wanna buy? You can tell how much you want to pay or where you live for example.", String.valueOf(userId), platform);
+            this.sendText("A great choice, but to give you the best results, you have to tell me a little bit more about the product you are looking for. You can tell how much you want to pay or where you live for example.", String.valueOf(userId), platform);
         }
 
         if (searchQuery.getMaxPrice() == null) {
