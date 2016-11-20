@@ -35,13 +35,16 @@ public class SubscriptionPersister {
 
         String object = (String) redisTemplate.opsForValue().get(key);
 
-        try {
-            List<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
-            });
+        if (object != null) {
 
-            return list;
-        } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                List<Subscription> list = mapper.readValue(object, new TypeReference<List<Subscription>>() {
+                });
+
+                return list;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return null;

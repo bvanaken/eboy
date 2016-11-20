@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +52,8 @@ public class UpdateService {
 
             logger.info("newestAd: " + newestAd);
 
-            Date newestDate = (Date) newestAd.getDateTime().getValue();
+            String dateStr = (String) newestAd.getDateTime().getValue();
+            Date newestDate = this.dateFromString(dateStr);
 
             logger.info("newestDate: " + newestDate);
             logger.info("lastDate: " + subscriptions.get(0).getLastAd());
@@ -72,7 +75,30 @@ public class UpdateService {
         for (Subscription subscription : subscriptions) {
 
             eventBus.post(new NotifyEvent(subscription.getUserId(), subscription.getPlatform(), ad.getPublicUrl()));
-            subscription.setLastAd((Date) ad.getDateTime().getValue());
+            Date adDate = dateFromString((String) ad.getDateTime().getValue());
+
+            logger.info("keys are: " + subscription.getKeywords());
+
+            subscription.setLastAd(adDate);
+            persister.persistSubscription(subscription.getKeywords(), subscription);
+        }
+
+    }
+
+    private Date dateFromString(String dateString) {
+
+        if (dateString.length() == 28) {
+            dateString = dateString.substring(0, dateString.length() - 9);
+        }
+
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        try {
+            return dateFormatter.parse(dateString);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
         }
 
     }

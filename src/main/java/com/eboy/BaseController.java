@@ -52,7 +52,7 @@ public class BaseController {
 
         String key = "hey";
 
-        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(), "keywords", 12.4f));
+        persister.persistSubscription(key, new Subscription(123L, Platform.FACEBOOK, new Date(), key, 12.4f));
 
         System.out.println("result: " + persister.getSubscriptions(key));
     }
