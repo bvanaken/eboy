@@ -71,6 +71,7 @@ public class OutgoingMessageService {
         tagsToKick.add(new Tag("floor"));
         tagsToKick.add(new Tag("indoor"));
         tagsToKick.add(new Tag("furniture"));
+        tagsToKick.add(new Tag("wall"));
     }
 
     public void sendText(String text, String userId, Platform platform) {
@@ -104,7 +105,7 @@ public class OutgoingMessageService {
     public void onQueryExtended(SearchQuery searchQuery, String extraKeywords, Long userId, Platform platform) {
 
         if (searchQuery.getMainKeyword() == null) {
-            this.sendText("I see. But what exactly do you wanna buy?", String.valueOf(userId), platform);
+            this.sendText("A great choice, but what exactly do you wanna buy? You can tell how much you want to pay or where you live for example.", String.valueOf(userId), platform);
         }
 
         if (searchQuery.getMaxPrice() == null) {
@@ -233,9 +234,14 @@ public class OutgoingMessageService {
 
         categories.removeAll(tagsToKick);
 
+        if(categories.isEmpty()) {
+            this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me, what you are looking for!", String.valueOf(userId), event.platform);
+            return;
+        }
+
         Tag tag = categories.get(0);
 
-        this.sendText(tag.name, String.valueOf(userId), event.platform);
+        onKeywordDetected(tag.name, userId, event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {

@@ -97,7 +97,7 @@ public class UpdateService {
             // CHECK PRICE
             if (subscription.getPrice() >= (Double) ad.getPrice().getAmount().getValue()) {
 
-                eventBus.post(new NotifyEvent(subscription.getUserId(), ad, subscription.getPlatform()));
+                eventBus.post(new NotifyEvent(subscription.getUserId(), subscription.getPlatform(), ad, null));
 
                 subscription.setLastAd(ad.getId());
                 persister.persistSubscription(subscription.getKeywords(), subscription);
