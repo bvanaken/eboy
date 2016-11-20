@@ -1,10 +1,7 @@
 package com.eboy.platform.telegram;
 
 import com.eboy.data.EbayAdService;
-import com.eboy.event.ImageRecognitionEvent;
-import com.eboy.event.MessageEvent;
-import com.eboy.event.NoClueEvent;
-import com.eboy.event.StartEvent;
+import com.eboy.event.*;
 import com.eboy.mv.ComputerVision;
 import com.eboy.mv.model.Recognition;
 import com.eboy.nlp.luis.LuisProcessor;
@@ -55,6 +52,8 @@ public class TelegramWebhookController {
     private final static Logger logger = Logger.getLogger(TelegramWebhookController.class.getName());
 
     private final static String START_COMMAND = "/start";
+    private final static String SELL_KEYWORD = "sell";
+    private final static String SELL_SENTENCE = "I want to sell my ";
 
     @RequestMapping(value = "/telegram/webhook", method = POST)
     public void receiveUpdate(@RequestBody com.eboy.platform.telegram.model.Update update) throws IOException {
@@ -67,7 +66,13 @@ public class TelegramWebhookController {
         boolean isPhotoMessage = message.getPhoto() != null && message.getPhoto().length > 0;
 
         if (isTextMessage) {
-            boolean isStartCommand = message.getText().toLowerCase().equals(START_COMMAND);
+            boolean isStartCommand = text.toLowerCase().equals(START_COMMAND);
+
+            if(message.getText().contains(SELL_KEYWORD)) {
+                eventBus.post(new SellEvent(chatId, Platform.TELEGRAM, text.replaceFirst(SELL_SENTENCE, "")));
+                return;
+            }
+
             if (isStartCommand) {
                 eventBus.post(new StartEvent(chatId, Platform.TELEGRAM));
                 return;
