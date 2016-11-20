@@ -35,6 +35,7 @@ public class TelegramMessageService implements MessageService {
             @Override
             public void onResponse(SendMessage request, com.pengrad.telegrambot.response.SendResponse response) {
                 logger.info(response.toString());
+                logger.info(request.toString());
             }
 
             @Override

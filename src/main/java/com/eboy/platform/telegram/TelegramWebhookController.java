@@ -1,8 +1,10 @@
 package com.eboy.platform.telegram;
 
 import com.eboy.data.EbayAdService;
+import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.mv.ComputerVision;
 import com.eboy.nlp.luis.LuisProcessor;
+import com.eboy.platform.Platform;
 import com.eboy.platform.telegram.model.Message;
 import com.eboy.platform.telegram.model.TelegramFile;
 import com.eboy.platform.telegram.model.response.FileResponse;
@@ -84,12 +86,15 @@ public class TelegramWebhookController {
 
         String fileUrl = Constants.getFilePath(filePath);
 
-        String keyword = imageAnalyzer.analyzeImage(fileUrl);
+
+        String urlObject = getUrlObject(fileUrl);
+        String keyword = imageAnalyzer.analyzeImage(urlObject);
 
         logger.info(keyword);
+        eventBus.post(new ImageRecognitionEvent(message.getChat().getId(), Platform.TELEGRAM, keyword));
     }
 
     public String getUrlObject(String filePath) {
-        return "{\"url\":" + filePath + "}";
+        return "{\"url\": \"" + filePath + "\" }";
     }
 }

@@ -3,6 +3,7 @@ package com.eboy.conversation.outgoing;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.dto.Price;
+import com.eboy.event.ImageRecognitionEvent;
 import com.eboy.event.IntentEvent;
 import com.eboy.event.NotifyEvent;
 import com.eboy.platform.MessageService;
@@ -90,6 +91,19 @@ public class OutgoingMessageService {
 
         String lastAdMessage = lastAdMessage(data);
         this.sendText(lastAdMessage, String.valueOf(userId), event.platform);
+    }
+
+    @Subscribe
+    public void handleEvent(ImageRecognitionEvent event) {
+        String keywords = event.keywords;
+        Long userId = event.userId;
+
+        Assert.notNull(keywords);
+        Assert.notNull(userId);
+
+        logger.info("Handle image recognition.");
+
+        this.sendText(keywords, String.valueOf(userId), event.platform);
     }
 
     private String getMessageForKey(final String key, final String[] params) {
