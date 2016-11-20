@@ -19,7 +19,6 @@ import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
 import com.eboy.subscriptions.SubscriptionPersister;
-import com.eboy.subscriptions.model.Subscription;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,16 +64,20 @@ public class OutgoingMessageService {
     }
 
     public void onKeywordDetected(String keyword, Long userId, Platform platform) {
-        Subscription subscription = new Subscription(userId, platform, null, null, keyword, null, null);
-
-        persister.persistSubscription(keyword, subscription);
 
         List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(keyword));
 
-        if (ads != null && ads.size() > 1) {
+        new SearchQuery(null, null, keyword, null);
 
+        if (ads == null || ads.size() < 2){
+
+
+        }
+
+        if (ads != null && ads.size() > 1) {
             eventBus.post(new SpecifyEvent());
-            this.sendText("We found " + ads.size() + " Articles. Do you want to specify a bit more?", String.valueOf(userId), platform);
+            this.sendText("I found " + ads.size() + " Articles for you! Do you want to specify a bit more?", String.valueOf(userId), platform);
+
         }
     }
 
@@ -111,8 +114,8 @@ public class OutgoingMessageService {
             case getLocation:
                 Optional<LuisEntity> locationType = entities.stream().filter(v -> v.getType().equals("locationType")).findFirst();
                 String locType = locationType.get().getType();
-                if(locType.equals("locationType::districtOfBerlin")) {
-                    
+                if (locType.equals("locationType::districtOfBerlin")) {
+
                 }
                 break;
         }

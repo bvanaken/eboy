@@ -26,11 +26,11 @@ public class LuisProcessor implements TextProcessor {
     public static final String QUALIFIER = "LuisProcessor";
     private final static Logger logger = Logger.getLogger(LuisProcessor.class.getName());
 
-    private final String APP_ID = "99c353f5-f5f0-401f-ade0-172035d6360d";
+    private final String APP_ID = "58017722-81dd-4ba9-910c-0ca83cd3d6db";
     private final String SUBSCRIPTION_KEY = "56cd4047fc5e439f9bd34ffa72dc23fd";
     private final String BASE_URL = "https://api.projectoxford.ai/luis/v2.0/apps/";
     private final String QUERY_URL = BASE_URL + APP_ID + "?subscription-key=" + SUBSCRIPTION_KEY + "&q=";
-
+    
     private RestTemplate restTemplate;
 
     @Autowired

@@ -17,4 +17,16 @@ public class NotifyEvent {
         this.data = data;
         this.platform = platform;
     }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public Platform getPlatform() {
+        return platform;
+    }
+
+    public Ad getData() {
+        return data;
+    }
 }
