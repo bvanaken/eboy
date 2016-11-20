@@ -3,8 +3,11 @@ package com.eboy.conversation.outgoing;
 import com.eboy.conversation.incoming.SearchQuery;
 import com.eboy.conversation.outgoing.dto.MessageEntry;
 import com.eboy.data.EbayAdService;
+import com.eboy.data.ExtendedAd;
+import com.eboy.data.MsAnalyticService.MsTextAnalyticService;
 import com.eboy.data.dto.Ad;
 import com.eboy.data.dto.Price;
+import com.eboy.data.keyPhraseModel.KeyPhraseModel;
 import com.eboy.event.*;
 import com.eboy.mv.model.Recognition;
 import com.eboy.mv.model.Tag;
@@ -16,6 +19,7 @@ import com.eboy.platform.Platform;
 import com.eboy.platform.facebook.FacebookMessageService;
 import com.eboy.platform.telegram.TelegramMessageService;
 import com.eboy.subscriptions.SubscriptionPersister;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -37,6 +42,7 @@ public class OutgoingMessageService {
     private SubscriptionPersister persister;
     @Autowired
     private EbayAdService adService;
+    MsTextAnalyticService textAnalyser;
     @Autowired
     private EventBus eventBus;
     private Map<String, List<MessageEntry>> generalMessageMap;
@@ -125,8 +131,15 @@ public class OutgoingMessageService {
     }
 
     @Subscribe
-    public void handleEvent(NotifyEvent event) {
+    public void handleEvent(NotifyEvent event) throws IOException{
         Ad data = event.data;
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<Ad> ads = new ArrayList<>(Arrays.asList(data));
+        String json = this.textAnalyser.analyzeAds(ads);
+        KeyPhraseModel keyPhrases = mapper.readValue(json, KeyPhraseModel.class);
+
+        ExtendedAd ad = new ExtendedAd(data, keyPhrases);
         Long userId = event.userId;
 
         Assert.notNull(data);
@@ -134,7 +147,7 @@ public class OutgoingMessageService {
 
         logger.info("Handle latest Ad.");
 
-        String lastAdMessage = lastAdMessage(data);
+        String lastAdMessage = lastAdMessage(ad);
         this.sendText(lastAdMessage, String.valueOf(userId), event.platform);
     }
 
@@ -182,16 +195,17 @@ public class OutgoingMessageService {
         return null;
     }
 
-    private String lastAdMessage(Ad ad) {
-        Price price = ad.getPrice();
-        Double amount = (Double) price.getAmount().getValue();
+    private String lastAdMessage(ExtendedAd ad) {
+
+        Double amount = ad.getPrice();
         StringBuilder sb = new StringBuilder();
         String NEW_LINE = "\n";
         sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
         sb.append(NEW_LINE);
         sb.append("The price for the item is: " + amount + "\n");
         sb.append(NEW_LINE);
-        sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
+        //sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
+        sb.append("I think it is noteworthy because:" + this.getRandomKeyPhrase(ad));
         sb.append(NEW_LINE);
         return sb.toString();
     }
@@ -204,5 +218,10 @@ public class OutgoingMessageService {
     @Subscribe
     public void handleEvent(NoClueEvent event) {
         sendText("I have no clue what you want from me.",String.valueOf(event.getUserId()), event.platform);
+    }
+
+    private String getRandomKeyPhrase(ExtendedAd ad) {
+        int index = (int) Math.round(Math.random()*ad.getKeyPhrases().length);
+        return ad.getKeyPhrases()[index];
     }
 }
