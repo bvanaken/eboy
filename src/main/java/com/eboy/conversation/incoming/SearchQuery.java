@@ -52,6 +52,13 @@ public class SearchQuery {
         this.extraKeyword = extraKeyword;
     }
 
+    public boolean isComplete() {
+        return (this.maxPrice != null &&
+                this.isBerlin != null &&
+                this.mainKeyword != null &&
+                this.extraKeyword != null);
+    }
+
     @Override
     public String toString() {
         return "SearchQuery{" +

@@ -68,8 +68,8 @@ public class TelegramWebhookController {
         if (isTextMessage) {
             boolean isStartCommand = text.toLowerCase().equals(START_COMMAND);
 
-            if(message.getText().contains(SELL_KEYWORD)) {
-                eventBus.post(new SellEvent(chatId, Platform.TELEGRAM, text.replaceFirst(SELL_SENTENCE, "")));
+            if (message.getText().contains(SELL_SENTENCE)) {
+                eventBus.post(new SellEvent(chatId, Platform.TELEGRAM, text.toLowerCase().replaceFirst(SELL_SENTENCE.toLowerCase(), "")));
                 return;
             }
 

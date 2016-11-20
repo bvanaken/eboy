@@ -8,5 +8,6 @@ public enum Intent {
     getItem,
     getFilter,
     getLocation,
-    getPriceRange
+    getPriceRange,
+    triggerSubscribe
 }

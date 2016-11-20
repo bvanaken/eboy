@@ -21,6 +21,10 @@ public class SellEvent {
         return userId;
     }
 
+    public String getKeywords() {
+        return keywords;
+    }
+
     public Platform getPlatform() {
         return platform;
     }
