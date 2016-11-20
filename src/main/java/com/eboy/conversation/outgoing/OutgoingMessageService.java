@@ -98,7 +98,7 @@ public class OutgoingMessageService {
         }
 
         if (ads != null && ads.size() > 1) {
-            this.sendText("I found " + adService.getNumberOfAdsForKeywords(Arrays.asList(keyword)) + " articles for you! Do you want to specify a bit more?", String.valueOf(userId), platform);
+            this.sendText("I found " + adService.getNumberOfAdsForKeywords(Arrays.asList(keyword)) + " items! Do you want to confine the results?", String.valueOf(userId), platform);
             queryPersister.persistSearchQuery(userId, searchQuery);
 
         } else {
@@ -110,19 +110,20 @@ public class OutgoingMessageService {
     public void onQueryExtended(SearchQuery searchQuery, String extraKeywords, Long userId, Platform platform) {
 
         if (searchQuery.getMainKeyword() == null) {
-            this.sendText("A great choice, but to give you the best results, you have to tell me a little bit more about the product you are looking for. You can tell how much you want to pay or where you live for example.", String.valueOf(userId), platform);
+            this.sendText("A great choice! For the best results, you have to tell me a little bit more...\n\n" +
+                    "For example telling me how much you want to pay or where you live, makes me fit your budget and city.", String.valueOf(userId), platform);
         }
 
         if (searchQuery.getMaxPrice() == null) {
-            this.sendText(extraKeywords + ", cool. Any price limit from your side?", String.valueOf(userId), platform);
+            this.sendText(extraKeywords + ", awesome! Any price limit from your side?", String.valueOf(userId), platform);
             return;
         }
         if (searchQuery.getBerlin() == null) {
-            this.sendText("Sounds good. Do you want to search in a specific city?", String.valueOf(userId), platform);
+            this.sendText("Sounds very good. Do you want to search in a specific city?", String.valueOf(userId), platform);
 
         } else {
 
-            this.sendText("I got it! Let's see what is out there...", String.valueOf(userId), platform);
+            this.sendText("Thanks, fly out my drones and lets see what we find for the human...", String.valueOf(userId), platform);
 
             List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword()), searchQuery.getMaxPrice(), searchQuery.getBerlin());
 
@@ -148,7 +149,7 @@ public class OutgoingMessageService {
         switch (intent) {
             case yes:
                 if (query.isComplete()) {
-                    this.sendText("Great, you will get a notification, once there's a new item.", String.valueOf(userId), event.getPlatform());
+                    this.sendText("Great, thank you. I will leave you a message, once there's a new item.", String.valueOf(userId), event.getPlatform());
 
                     Subscription subscription = new Subscription(userId, event.getPlatform(), null, null, query.getMainKeyword(), query.getMaxPrice(), query.getBerlin());
                     persister.persistSubscription(String.valueOf(userId), subscription);
@@ -262,7 +263,7 @@ public class OutgoingMessageService {
         categories.removeAll(tagsToKick);
 
         if (categories.isEmpty()) {
-            this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me, what you are looking for!", String.valueOf(userId), event.platform);
+            this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me. :)", String.valueOf(userId), event.platform);
             return;
         }
 
@@ -296,7 +297,7 @@ public class OutgoingMessageService {
     }
 
     private String lastAdMessage(ExtendedAd ad) {
-        Double amount = (Double) ad.getPrice();
+        Double amount = ad.getPrice();
 
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
         String moneyString = formatter.format(amount);
@@ -376,7 +377,7 @@ public class OutgoingMessageService {
             for (int j = 0; j <keyphrases.length; j++) {
                 if (positives[i].contains(keyphrases[j].toLowerCase())){
                     return keyphrases[j];
-                };
+                }
             }
         }
 
