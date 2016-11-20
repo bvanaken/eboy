@@ -1,9 +1,11 @@
 package com.eboy.data;
 
 import com.eboy.data.dto.Ad;
+import com.eboy.data.dto.Picture;
 import com.eboy.data.keyPhraseModel.KeyPhraseModel;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by alex on 20.11.16.
@@ -21,6 +23,7 @@ public class ExtendedAd {
     Date dateTime;
 
     String[] keyPhrases;
+    String publicPicture;
 
     public ExtendedAd(Ad ad, KeyPhraseModel keyPhraseModel) {
         this.id = ad.getId();
@@ -31,8 +34,9 @@ public class ExtendedAd {
         this.latitude = Double.parseDouble(ad.getAddress().getLatitude().getValueAsString());
         this.longitude = Double.parseDouble(ad.getAddress().getLongitude().getValueAsString());
         this.status = ad.getStatus().getValueAsString();
-         this.dateTime = ad.getDateTime();
+        this.dateTime = ad.getDateTime();
         this.keyPhrases = keyPhraseModel.getKeyPhrases(this.id);
+        publicPicture = ad.getPublicPicture();
     }
 
     public Long getId() {
@@ -73,5 +77,13 @@ public class ExtendedAd {
 
     public String[] getKeyPhrases() {
         return keyPhrases;
+    }
+
+    public String getPublicPicture() {
+        return publicPicture;
+    }
+
+    public void setPublicPicture(String publicPicture) {
+        this.publicPicture = publicPicture;
     }
 }

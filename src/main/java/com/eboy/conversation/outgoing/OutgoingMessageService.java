@@ -98,7 +98,7 @@ public class OutgoingMessageService {
         }
 
         if (ads != null && ads.size() > 1) {
-            this.sendText("I found " + adService.getNumberOfAdsForKeywords(Arrays.asList(keyword)) + " articles for you! Do you want to specify a bit more?", String.valueOf(userId), platform);
+            this.sendText("I found " + adService.getNumberOfAdsForKeywords(Arrays.asList(keyword)) + " items! Do you want to confine the results?", String.valueOf(userId), platform);
             queryPersister.persistSearchQuery(userId, searchQuery);
 
         } else {
@@ -110,19 +110,20 @@ public class OutgoingMessageService {
     public void onQueryExtended(SearchQuery searchQuery, String extraKeywords, Long userId, Platform platform) {
 
         if (searchQuery.getMainKeyword() == null) {
-            this.sendText("A great choice, but to give you the best results, you have to tell me a little bit more about the product you are looking for. You can tell how much you want to pay or where you live for example.", String.valueOf(userId), platform);
+            this.sendText("A great choice! For the best results, you have to tell me a little bit more...\n\n" +
+                    "For example telling me how much you want to pay or where you live, makes me fit your budget and city.", String.valueOf(userId), platform);
         }
 
         if (searchQuery.getMaxPrice() == null) {
-            this.sendText(extraKeywords + ", cool. Any price limit from your side?", String.valueOf(userId), platform);
+            this.sendText(extraKeywords + ", awesome! Any price limit from your side?", String.valueOf(userId), platform);
             return;
         }
         if (searchQuery.getBerlin() == null) {
-            this.sendText("Sounds good. Do you want to search in a specific city?", String.valueOf(userId), platform);
+            this.sendText("Sounds very good. Do you want to search in a specific city?", String.valueOf(userId), platform);
 
         } else {
 
-            this.sendText("I got it! Let's see what is out there...", String.valueOf(userId), platform);
+            this.sendText("Thanks, fly out my drones and lets see what we find for the human...", String.valueOf(userId), platform);
 
             List<Ad> ads = adService.getAdsForKeywords(Arrays.asList(searchQuery.getMainKeyword()), searchQuery.getMaxPrice(), searchQuery.getBerlin());
 
@@ -148,7 +149,7 @@ public class OutgoingMessageService {
         switch (intent) {
             case yes:
                 if (query.isComplete()) {
-                    this.sendText("Great, you will get a notification, once there's a new item.", String.valueOf(userId), event.getPlatform());
+                    this.sendText("Great, thank you. I will leave you a message, once there's a new item.", String.valueOf(userId), event.getPlatform());
 
                     Subscription subscription = new Subscription(userId, event.getPlatform(), null, null, query.getMainKeyword(), query.getMaxPrice(), query.getBerlin());
                     persister.persistSubscription(String.valueOf(userId), subscription);
@@ -262,13 +263,29 @@ public class OutgoingMessageService {
         categories.removeAll(tagsToKick);
 
         if (categories.isEmpty()) {
-            this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me, what you are looking for!", String.valueOf(userId), event.platform);
+            this.sendText("Sorry, I couldn't figure out a valuable product for your request. Maybe you should just write me. :)", String.valueOf(userId), event.platform);
             return;
         }
 
         Tag tag = categories.get(0);
 
-        onKeywordDetected(tag.name, userId, event.platform);
+        String translation = getTranslation(tag);
+
+        onKeywordDetected(translation, userId, event.platform);
+    }
+
+    private String getTranslation(Tag tag) {
+        if (tag.name.toLowerCase().equals("bycicle")) {
+            return "Fahrrad";
+        }
+        if (tag.name.toLowerCase().equals("chair")) {
+            return "Stuhl";
+        }
+        if (tag.name.toLowerCase().equals("mouse")) {
+            return "Computermaus";
+        }
+
+        return tag.name;
     }
 
     private String getMessageForKey(final String key, final String[] params) {
@@ -296,21 +313,25 @@ public class OutgoingMessageService {
     }
 
     private String lastAdMessage(ExtendedAd ad) {
-        Double amount = (Double) ad.getPrice();
+        Double amount = ad.getPrice();
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.GERMANY);
         String moneyString = formatter.format(amount);
 
         StringBuilder sb = new StringBuilder();
         String NEW_LINE = "\n";
 
-        sb.append("Hey! I have found a new item for you, that you subscribed for. Wanna take a look? \n");
+        sb.append("Hey! I have found a new product that you may be interested in. Lets just have a look together and let me know, if you need something else.");
         sb.append(NEW_LINE);
-        sb.append("The price for the item is: " + moneyString + "€ \n");
         sb.append(NEW_LINE);
-        //sb.append("Thats all I know about this article: " + ad.getDescription().getValueAsString());
-        sb.append("I think it is noteworthy because:" + this.getRandomKeyPhrase(ad));
+        sb.append("<b>" + ad.getTitle() + "</b>");
+        sb.append("<b>The product is available for you for: </b>" + moneyString);
         sb.append(NEW_LINE);
+        sb.append(NEW_LINE);
+        sb.append("<b>I think it is noteworthy because: </b>" + this.getRandomKeyPhrase(ad));
+        sb.append(NEW_LINE);
+        sb.append(NEW_LINE);
+        sb.append(ad.getPublicPicture());
         return sb.toString();
     }
 
@@ -326,7 +347,7 @@ public class OutgoingMessageService {
         String userId = String.valueOf(event.getUserId());
         Platform platform = event.getPlatform();
 
-        if(info != null){
+        if (info != null) {
 
             Integer subscribers = info.getNumberSubscribers();
 
@@ -373,10 +394,10 @@ public class OutgoingMessageService {
 
         String[] keyphrases = ad.getKeyPhrases();
         for (int i = 0; i < positives.length; i++) {
-            for (int j = 0; j <keyphrases.length; j++) {
-                if (positives[i].contains(keyphrases[j].toLowerCase())){
+            for (int j = 0; j < keyphrases.length; j++) {
+                if (positives[i].contains(keyphrases[j].toLowerCase())) {
                     return keyphrases[j];
-                };
+                }
             }
         }
 
