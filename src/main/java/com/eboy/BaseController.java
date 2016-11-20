@@ -151,7 +151,7 @@ public class BaseController {
     @RequestMapping("/trigger-update")
     public String getTriggerUpdate() throws IOException {
 
-        eventBus.post(new NotifyEvent("",""));
+        /*eventBus.post(new NotifyEvent("",""));*/
 
         return "Sucess!";
     }

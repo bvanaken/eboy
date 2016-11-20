@@ -30,7 +30,7 @@ public class LuisProcessor implements TextProcessor {
     private final String SUBSCRIPTION_KEY = "56cd4047fc5e439f9bd34ffa72dc23fd";
     private final String BASE_URL = "https://api.projectoxford.ai/luis/v2.0/apps/";
     private final String QUERY_URL = BASE_URL + APP_ID + "?subscription-key=" + SUBSCRIPTION_KEY + "&q=";
-    
+
     private RestTemplate restTemplate;
 
     @Autowired

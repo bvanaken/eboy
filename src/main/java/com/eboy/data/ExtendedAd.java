@@ -21,6 +21,7 @@ public class ExtendedAd {
     Date dateTime;
 
     String[] keyPhrases;
+
     public ExtendedAd(Ad ad, KeyPhraseModel keyPhraseModel) {
         this.id = ad.getId();
         this.title = ad.getTitle().getValueAsString();
@@ -32,5 +33,45 @@ public class ExtendedAd {
         this.status = ad.getStatus().getValueAsString();
          this.dateTime = ad.getDateTime();
         this.keyPhrases = keyPhraseModel.getKeyPhrases(this.id);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Date getDateTime() {
+        return dateTime;
+    }
+
+    public String[] getKeyPhrases() {
+        return keyPhrases;
     }
 }

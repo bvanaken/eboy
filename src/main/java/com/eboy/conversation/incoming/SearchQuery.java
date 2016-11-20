@@ -11,7 +11,6 @@ public class SearchQuery {
     private String extraKeyword;
 
     public SearchQuery() {
-        //
     }
 
     public SearchQuery(Float maxPrice, Boolean isBerlin, String mainKeyword, String extraKeyword) {
