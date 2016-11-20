@@ -280,7 +280,21 @@ public class OutgoingMessageService {
     }
 
     private String getRandomKeyPhrase(ExtendedAd ad) {
-        int index = (int) Math.round(Math.random() * ad.getKeyPhrases().length);
+
+        String[] positives = new String[]{
+                "neu", "neuwertig", "unbenutzt", "hochwertig", "wertig", "modern",
+                "günstig", "schnell", "leistung", "hochgradig", "luxuriös", "ideal", "praktisch", "gut", "beste", "sauber"};
+
+        String[] keyphrases = ad.getKeyPhrases();
+        for (int i = 0; i < positives.length; i++) {
+            for (int j = 0; j <keyphrases.length; j++) {
+                if (positives[i].contains(keyphrases[i].toLowerCase())){
+                    return keyphrases[i];
+                };
+            }
+        }
+
+        int index = (int) Math.round(Math.random() * keyphrases.length);
         return ad.getKeyPhrases()[index];
     }
 }
