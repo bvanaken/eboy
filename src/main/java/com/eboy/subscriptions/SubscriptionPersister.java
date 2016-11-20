@@ -46,6 +46,15 @@ public class SubscriptionPersister {
         return null;
     }
 
+    public Subscription getSubscriptionForUser(final String key, Long userId) {
+        Assert.notNull(key);
+
+        List<Subscription> subscriptions = this.getSubscriptions(key);
+
+        return subscriptions.stream().filter(subscription -> userId.equals(subscription.getUserId())).findFirst().orElse(null);
+
+    }
+
     public Set<String> getKeys() {
 
         Set<String> keys = redisTemplate.keys("*");
