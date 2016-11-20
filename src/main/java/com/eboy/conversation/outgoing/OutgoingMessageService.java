@@ -309,7 +309,7 @@ public class OutgoingMessageService {
         sb.append(NEW_LINE);
         sb.append(NEW_LINE);
         sb.append("<b>" + ad.getTitle() + "</b>");
-        sb.append("<b>The price for the item is: </b>" + moneyString);
+        sb.append("<b>The product is available for you for: </b>" + moneyString);
         sb.append(NEW_LINE);
         sb.append(NEW_LINE);
         sb.append("<b>I think it is noteworthy because: </b>" + this.getRandomKeyPhrase(ad));
